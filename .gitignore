@@ -6,7 +6,8 @@
 /exemple
 /jsMyLib
 /storage
-/git reset --soft app/entrance.php
+/app/entrance.php
+.gitignore
 composer.lock
 index.html
 index.php
