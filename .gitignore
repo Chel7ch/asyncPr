@@ -1,0 +1,13 @@
+/.git
+/.idea
+/app/view
+/vendor
+/node_modules
+/exemple
+/jsMyLib
+/storage
+/app/entrance.php
+composer.lock
+index.html
+index.php
+package-lock.json
