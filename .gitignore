@@ -7,7 +7,7 @@
 /jsMyLib
 /storage
 /app/entrance.php
-.gitignore
+/.gitignore
 composer.lock
 index.html
 index.php
