@@ -1,0 +1,19 @@
+
+{
+  "require": {
+    "guzzlehttp/guzzle": "~6.0",
+    "imangazaliev/didom": "^1.14",
+    "ext-pdo": "*",
+    "ext-curl": "*",
+    "php-webdriver/webdriver": "^1.7"
+  },
+  "autoload": {
+    "psr-4": {
+      "Src\\": "app/src/",
+      "Client\\": "app/src/httpClient/",
+      "Parser\\": "app/src/parser/",
+      "DB\\": "app/src/saveResult/",
+      "Proxy\\": "app/src/proxy/"
+    }
+  }
+}
