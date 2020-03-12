@@ -40,7 +40,7 @@ class DBCreateTable
             'CREATE TABLE IF NOT EXISTS collect_proxy (
             id int(6) AUTO_INCREMENT PRIMARY KEY,
             field1  VARCHAR (22) NOT NULL,
-            field2  VARCHAR (15),
+            field2  VARCHAR (25),
             field3  VARCHAR (10),
             field4  VARCHAR (50),
             field5  INTEGER (2),

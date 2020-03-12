@@ -2,9 +2,11 @@
 
 namespace DB;
 
+use PDO;
+
 class DBPdoCRUD
 {
-    public  $sql;
+    public $sql;
 
     public function __construct(\DB\IDBConnection $pdo)
     {
@@ -16,33 +18,25 @@ class DBPdoCRUD
         return $this->sql->connect();
     }
 
-    public function insertDB($sql=''){
+    public function insertDB($sql = '')
+    {
         $this->connect()->exec($sql);
     }
 
-    public function selDBProxy($tab ='collect_proxy')
+    public function selDBProxy($tab = 'collect_proxy')
     {
-        $sql = 'SELECT * FROM '. $tab  ;
-//        $sql = 'SELECT COUNT(*) FROM collect_proxy';
-//        $sql = 'SELECT field1 FROM ' . $tab . ' WHERE field2 = "HTTP" ORDER BY id DESC LIMIT 0,20;';
+        static $i = 1;
+//        $sql = 'SELECT id, field1 FROM ' . $tab . ' WHERE id >=' . $i . ' AND id <=' . $i = $i + 50;
+        $sql = 'SELECT  field1 FROM ' . $tab . ' WHERE id >=' . $i . ' LIMIT 50';
+        $results = $this->connect()->query($sql)->fetchAll(PDO::FETCH_COLUMN);
+        $i = +50;
 
-        $st = $this->connect()->query($sql);
-        $results = $st->fetchAll();
-//        print_r($results);
         return $results;
-//        foreach ($results as $row) {
-////            print_r($results);
-//            echo $row['id'] . ' ';
-//            echo $row['field1'] . ' ';
-//            echo $row['field2'] . ' ';
-//            echo $row['field4'].' <br>';
-////            echo $row['field3'].'<br> ';
-//        }
     }
 
-    public function selectDB($sql='')
+    public function selectDB($sql = '')
     {
-        $sql = 'SELECT * FROM '. TAB_NAME;
+        $sql = 'SELECT * FROM ' . TAB_NAME;
 
         $st = $this->connect()->query($sql);
         $results = $st->fetchAll();
@@ -56,7 +50,8 @@ class DBPdoCRUD
         }
     }
 
-    public function cleanTable($nameTable){
+    public function cleanTable($nameTable)
+    {
         $sql = "TRUNCATE $nameTable";
         $this->connect()->exec($sql);
     }

@@ -3,7 +3,6 @@
 namespace Parser;
 
 /** This is the kit of functions for prepare output */
-
 abstract class PrepareOutput
 {
     /**
@@ -33,11 +32,12 @@ abstract class PrepareOutput
     {
         /** deff count arrays
          * @var  integer $maxCount number of elements in the largest array  in $data
-         * @var integer $numbArray number of arrays in $data         */
+         * @var integer $numbArray number of arrays in $data
+         */
 
         $maxCount = 0;
         $numbArray = 0;
-        $dt =array();
+        $dt = array();
         foreach ($data as $a) {
             $numbArray++;
             $c = count((array)$a);
@@ -47,8 +47,9 @@ abstract class PrepareOutput
         for ($f = 0; $f < $maxCount; $f++) {
             $str = '\'' . $data[0] . '\', ';
             for ($i = 1; $i < $numbArray; $i++) {
-                if(empty(strip_tags($data[$i][$f]))) $str .= '\'  \' ';
-                else{
+
+                if (empty(strip_tags($data[$i][$f]))) $str .= '\'  \' ';
+                else {
                     /** deleting apostrophes*/
                     $a = str_replace("'", '', strip_tags($data[$i][$f]));
                     /** escaping single quotes*/
@@ -62,6 +63,18 @@ abstract class PrepareOutput
 
         return $dt;
     }
+
+    public function multiTurnOverOutput($dt)
+    {
+        $dat = array();
+
+        for ($f = 0; $f < count($dt); $f++) {
+            $dat =  array_merge($dat , $this->turnOverOutput($dt[$f]));
+        }
+
+        return $dat;
+    }
+
     /**
      * prepare  insert query for DB
      * @param array $data
@@ -71,7 +84,7 @@ abstract class PrepareOutput
     public function prepInsertDB($data)
     {
         $query = '';
-        if(empty($data)){
+        if (empty($data)) {
             return $query;
         }
 

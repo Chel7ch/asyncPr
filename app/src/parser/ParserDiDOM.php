@@ -49,7 +49,7 @@ abstract class ParserDiDOM extends PrepareOutput
 
     /**
      * @param string $url the URN pages
-     * @return string $doc  get page by DiDOM
+     * @return object ParserDiDOM
      */
     public function parsPage($url)
     {
@@ -58,6 +58,32 @@ abstract class ParserDiDOM extends PrepareOutput
             $this->page = $this->doc->loadHtml($document);
         }
         return $this;
+    }
+
+    /**
+     * @param array $urls
+     * @return object ParserDiDOM
+     */
+    public function parsMultiPage($urls)
+    {
+        $docs = $this->client->getMultiPages($urls);
+
+        foreach ($docs as $key => $doc) {
+            $this->page[$key] = new Document($doc);
+        }
+
+        return $this;
+    }
+
+    public function getMultiLinks()
+    {
+        $links = array();
+        foreach ($this->page as $pg) {
+            $links = array_merge($links, $pg->find('a::attr(href)'));
+        }
+        $links = $this->cleanLinks($links);
+
+        return $links;
     }
 
     /**
@@ -81,6 +107,32 @@ abstract class ParserDiDOM extends PrepareOutput
      * @param array $scratches DiDom find expressions
      * @return array
      */
+    public function multibenefit($pages, $scratches = [])
+    {
+        $dt = array();
+
+        foreach ($this->page as $key => $pg) {
+
+            $data[] = $pages[$key];
+            foreach ($scratches as $scratch) {
+                (USING_XPATH == 1) ? $data[] = $pg->find($scratch, Query::TYPE_XPATH) : $data[] = $pg->find($scratch);
+            }
+            $dt[] = $data;
+            unset($data);
+        }
+
+        return $dt;
+    }
+
+    public function multiPrepOutput($data)
+    {
+        if (PREPARE_BENEFIT == 1) $data = $this->multiTurnOverOutput($data);
+        elseif (PREPARE_BENEFIT == 0) $data = $this->straightOutput($data);
+        if (PREP_QUERY_FOR_DB == 1) $data = $this->prepInsertDB($data, 'proxy');
+
+        return $data;
+    }
+
     public function benefit($page, $scratches = [])
     {
         $data[] = $page;

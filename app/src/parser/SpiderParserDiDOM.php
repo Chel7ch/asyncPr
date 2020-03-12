@@ -63,4 +63,47 @@ class SpiderParserDiDOM extends ParserDiDOM
         echo '</pre>';
     }
 
+    public function multiSpider($urls, $scratch = [], $links = [])
+    {
+        if (empty($links)) {
+            $linked = array();
+
+            $links = $this->parsMultiPage($urls)->getMultiLinks();
+            $b = $this->multiPrepOutput($this->multiBenefit($urls, $scratch));
+            if (!empty($b)) $this->insertDB($b);
+        }
+
+        for ($i = 1; $i <= LEVELS; $i++) {
+            $sub = array();
+            while ($links) {
+                $urls = array_splice($links, 0, MULTI_REQUEST);
+                $subLinks = $this->parsMultiPage($urls)->getMultiLinks();
+                $b = $this->multiPrepOutput($this->multiBenefit($urls, $scratch));
+                if (!empty($b)) $this->insertDB($b);
+
+                echo 'уровень  ' . $i . '  _  ' . count($linked) . '  в linked  ' . count($links) . '  в $links <br>';
+
+                $linked = array_merge($linked, $urls);
+                $sub = array_merge($sub, array_diff($subLinks, $links, $linked));
+                usleep(USLEEP);
+            }
+            $links = $sub;
+            unset($sub);
+        }
+
+// todo заставить работать правильно ( сделать if !empty)
+        for ($e = 0; $e < REPEAT_ERR_URL; $e++) {
+            $this->readErrorURL();
+            sleep(REPEAT_ERR_URL_DELAY);
+        }
+
+
+        echo '<pre>';
+        echo '<br>links<br>';
+        print_r($links);
+        echo '<br>linked<br>';
+        print_r($linked);
+        echo '</pre>';
+    }
+
 }
