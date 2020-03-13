@@ -6,7 +6,7 @@ namespace Client;
 class HttpCurl implements IHttpClient
 {
     use ErrResp, SaveHTMLPage;
-    public $url ;
+    public $url;
     private $header;
     private $page;
     public $scratch;
@@ -57,15 +57,17 @@ class HttpCurl implements IHttpClient
         $outputString = 1;
         $followlacation = 1;
         $cookie = COOKIE_FILE . '/cookie.txt';
+//        print_r($proxy);
+//        echo 'dd<br>';
 
         $curl = curl_init();
 
         curl_setopt($curl, CURLOPT_URL, $page);
 //        if ($postData != '') {
-            curl_setopt($curl, CURLOPT_POST, !is_null($postData)); // TRUE для HTTP POST
-            if ($postData) curl_setopt($curl, CURLOPT_POSTFIELDS, $postData); // сами POST переменые
+//            curl_setopt($curl, CURLOPT_POST, !is_null($postData)); // TRUE для HTTP POST
+//            if ($postData) curl_setopt($curl, CURLOPT_POSTFIELDS, $postData); // сами POST переменые
 //        }
-//        curl_setopt($curl, CURLOPT_HEADER, 1);  // FALSE отключение заголовкa из вывода
+        curl_setopt($curl, CURLOPT_HEADER, 1);  // FALSE отключение заголовкa из вывода
 //        curl_setopt($curl, CURLOPT_NOBODY, 0);  // TRUE исключения тела ответа из вывода
 //        curl_setopt($curl, CURLOPT_FAILONERROR, 1);  // TRUE для подробного отчета при неудаче, если полученный HTTP-код больше или равен 400.
 //        curl_setopt($curl, CURLINFO_HEADER_OUT, 1); // для curl_info() TRUE для отслеживания строки запроса дескриптора.
@@ -78,8 +80,8 @@ class HttpCurl implements IHttpClient
         curl_setopt($curl, CURLOPT_ENCODING, 'utf-8'); // Содержимое заголовка "Accept-Encoding:
         curl_setopt($curl, CURLOPT_REFERER, 'http://diesel.elcat.kg/'); // Содерж. заг-а "Referer:" -URL с какой страницы пришли
 
-//        curl_setopt($curl, CURLOPT_PROXY, '151.253.165.70:8080'); // IP HTTP-прокси, через который будут направляться запросы.
-//        curl_setopt($curl, CURLOPT_PROXY, $proxy); // IP HTTP-прокси, через который будут направляться запросы.
+//        curl_setopt($curl, CURLOPT_PROXY, '77.37.208.119:55491'); // IP HTTP-прокси, через который будут направляться запросы.
+        curl_setopt($curl, CURLOPT_PROXY, $proxy); // IP HTTP-прокси, через который будут направляться запросы.
 //        curl_setopt($curl, CURLOPT_HTTPPROXYTUNNEL, 1); //
 //        curl_setopt($curl, CURLOPT_PROXYTYPE, "CURLPROXY_SOCKS4"); // либо либо CURLPROXY_SOCKS4, CURLPROXY_SOCKS5
 
@@ -92,14 +94,14 @@ class HttpCurl implements IHttpClient
 
         curl_setopt($curl, CURLOPT_COOKIEJAR, $cookie);  // файл, куда пишутся куки
         curl_setopt($curl, CURLOPT_COOKIEFILE, $cookie);  // файл, откуда читаются куки
-        curl_setopt($curl, CURLOPT_COOKIESESSION, 1); // TRUE для указания текущему сеансу начать новую "сессию" cookies. т.е. игнорирует все "сессионные" cookies, полученные из предыдущей сессии.
+//        curl_setopt($curl, CURLOPT_COOKIESESSION, 1); // TRUE для указания текущему сеансу начать новую "сессию" cookies. т.е. игнорирует все "сессионные" cookies, полученные из предыдущей сессии.
 
         curl_setopt($curl, CURLOPT_SSL_VERIFYPEER, 0);  // FALSE для остановки cURL от проверки сертификата узла сети
         curl_setopt($curl, CURLOPT_SSL_VERIFYHOST, 0);  // FALSE  не проверяем SSL удалённого сервера. 0-1-2
 
         curl_setopt($curl, CURLOPT_RETURNTRANSFER, $outputString); // 0 - вывод в браузер 1- возвращение строки
-        curl_setopt($curl, CURLOPT_TIMEOUT, 5);  // Макс. позволенное колич. секунд для выполнения cURL-функций
-        curl_setopt($curl, CURLOPT_CONNECTTIMEOUT, 5);  // сек. таймаут соединения. 0 - бесконечное ожидание
+        curl_setopt($curl, CURLOPT_TIMEOUT, 10);  // Макс. позволенное колич. секунд для выполнения cURL-функций
+        curl_setopt($curl, CURLOPT_CONNECTTIMEOUT, 10);  // сек. таймаут соединения. 0 - бесконечное ожидание
 
         return $curl;
 
@@ -115,6 +117,7 @@ class HttpCurl implements IHttpClient
             $resp = curl_getinfo($curl);
             $this->errResp($resp['http_code'], $page);
 
+            echo '<br>' . $resp['http_code'] . 'ответ сервера<br>';//!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 //            if (HTTP_INFO == 1) HTTPInfo::Info($page, $curl);
 
         } catch (RequestException $e) {

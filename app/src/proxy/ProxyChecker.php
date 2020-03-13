@@ -2,9 +2,12 @@
 
 namespace Proxy;
 
+use DB\DBPdoCRUD;
 
 class ProxyChecker
 {
+    public $goodProxy = array();
+
     /**
      * @param \Client\IHttpClient $client
      */
@@ -19,38 +22,74 @@ class ProxyChecker
      * @param string $url
      * @return string HTML doc
      */
-    public function getPage($url)
+    public function getPage($url, $proxy = '')
     {
-        return $this->client->getPage($url);
+        return $this->client->getPage($url, $proxy);
     }
 
-    public function ownIP($url = 'http://razrabotkaweb.ru/ip.php')
+    public function ownIP($proxy = '', $url = 'http://razrabotkaweb.ru/ip.php')
+//    public function ownIP($proxy = '', $url = 'http://httpbin.org/ip')
     {
-        return $this->client->getPage($url);
+        return $this->client->getPage($url, $proxy);
     }
 
-    public function diffIP($proxy, $url = 'http://razrabotkaweb.ru/ip.php')
+    public function diffIP($proxy = '', $url = 'http://razrabotkaweb.ru/ip.php')
+//    public function diffIP($proxy = '', $url = 'http://httpbin.org/ip')
     {
         static $own = 0;
         static $ownIp = '';
+
         if ($own == 0) {
-            $ownIp = $this->ownIP();
+            $ip = $this->ownIP();
+            preg_match('#\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3}#', $ip, $match);
+            $ownIp = implode('', $match);
             $own++;
         }
 
-        $proxy = $this->client->getPage($url);
-        if (!strpos($proxy, $ownIp)) {
-            echo $ownIp;
-            return $proxy;
-        }
-        return 'плохой proxy' . $proxy . '<br>';
+        $pr = $this->client->getPage($url, $proxy);
+
+        if (!empty($pr)) {
+            preg_match('#\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3}#', $pr, $match);
+            $receiveIp = implode('', $match);
+
+            preg_match('#\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3}#', $proxy, $match);
+            $proxyIp = implode('', $match);
+            echo '<br>' . $receiveIp . ' ответ прокси вместо ' . $proxyIp;//!!!!!!!!!!!!!!!!!!!!
+
+            if ($receiveIp and $receiveIp != $ownIp) {
+                $this->goodProxy[] = $proxy;
+                echo $proxy .'++++++<br>';
+            }
+        } else echo 'плохой proxy' . $proxy;
+
+        return $pr;
     }
 
     public function checkProxy()
     {
-        foreach ($this->selDBProxy() as $proxy) {
-            $this->diffIP($proxy);
+        $rowId = 1;
+        $z =1;
+
+        $selProxy = $this->selDBProxy($rowId);
+
+        while (count($this->goodProxy) < 50) {
+
+            foreach ($selProxy as $proxy) {
+
+                $this->diffIP($proxy);
+
+//                usleep(500000);
+                echo '<br>' . $z++ . ' цикл checkProxy<br><br>';//!!!!!!!!!!!
+            }
+            $rowId += 50;
+            if ($rowId > 2500) break;
+
+            print_r($this->goodProxy);//!!!!!!!!!!!!!!!!!!!!!!
+            echo 'всего<br>';//!!!!!!!!!!!!!!!!!!!!!!
+
+            $selProxy = $this->selDBProxy($rowId);
         }
+
     }
 
     /** ConnectDB  */
@@ -60,41 +99,9 @@ class ProxyChecker
     }
 
     /** SelectDB  */
-    public function selDBProxy()
+    public function selDBProxy($rowId)
     {
-        return $this->conn->selDBProxy();
+        return $this->conn->selDBProxy($rowId);
     }
 
-
-    public function checkerr()
-    {
-        $gdata = array();
-        $gproxy_a = array();
-        $gproxy = "";
-        $c = $g = $b = $t = '0';
-
-        $proxy_a = file("proxylist.txt");
-        $t = count($proxy_a);
-        foreach ($proxy_a as $key => $value) {
-            $c++;
-            $value = str_replace(array("\n", "\r", " "), '', $value);
-            $buf = get('http://yoip.ru/', $value);
-            preg_match("#<span class='ip'>([a-z:0-9.]+)</span>#i", $buf, $gdata["ip"]);
-            if (isset($gdata["ip"][1])) {
-                $ip = $gdata["ip"][1];
-                if (!isset($gproxy_a[$ip])) {
-                    $g++;
-                    $gproxy_a[$ip] = $value;
-                    $gproxy .= $value . "
-";
-                }
-                echo "[c:$c/t:$t][g:$g/b:$b] " . $value . " (" . $ip . ") - ok;\r\n";
-            } else {
-                $b++;
-                echo "[c:$c/t:$t][g:$g/b:$b] " . $value . " - error;\r\n";
-
-            }
-        }
-
-    }
 }

@@ -23,13 +23,14 @@ class DBPdoCRUD
         $this->connect()->exec($sql);
     }
 
-    public function selDBProxy($tab = 'collect_proxy')
+    public function selDBProxy($rowId, $tab = 'collect_proxy')
     {
         static $i = 1;
 //        $sql = 'SELECT id, field1 FROM ' . $tab . ' WHERE id >=' . $i . ' AND id <=' . $i = $i + 50;
-        $sql = 'SELECT  field1 FROM ' . $tab . ' WHERE id >=' . $i . ' LIMIT 50';
+        $sql = 'SELECT  field1 FROM ' . $tab . ' WHERE id >' . $rowId . ' LIMIT 50';
         $results = $this->connect()->query($sql)->fetchAll(PDO::FETCH_COLUMN);
-        $i = +50;
+
+        echo $rowId . 'table<br>';
 
         return $results;
     }
