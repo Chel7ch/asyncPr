@@ -1,12 +1,13 @@
 <?php
-# file ini.php should be in the folder app
+# file main.php should be in the folder app
 
-$t = array('https://' => '', 'http://' => '');
-$project = strstr ( strtr($url."/", $t), '/', TRUE);
+$project =parse_url($url,1);
+$tabName = str_replace ('.', '_', $project);
+$t = parse_url($url,0).'://' . parse_url($url,1);
 
-$t = array('.' => '_');
-$tabName = strtr($project, $t);
-
+/** URL */
+define('URL', $t);
+@define('TAIL', $tail);
 /** Folders */
 define('PROJECT', $project);
 define('STRLEN_PROJECT', strlen($project));
@@ -18,18 +19,19 @@ define('LOG_FILE', DIR_SCRIPT. '/storage/logs/php_errors.log');
 define('ERR_RESP_FILE', PROJECT_DIR . '/logs/err_response.csv');
 /** Setting */
 define('MULTI_REQUEST', 2); // number of concurrent requests
-define('USLEEP', 0.4 *100000); // milliseconds waiting for script
+define('USLEEP', 0.2 *100000); // milliseconds waiting for script
 define('REPEAT_ERR_URL', 0); // number repeat of the repeatErrorURL
 define('REPEAT_ERR_URL_DELAY', 60); // time between repeatErrorURL
-define('LEVELS', 50); // number of Spider pass levels
+@define('LEVELS', 1); // number of Spider pass levels
 define('SAVE_HTML_PAGE', 0);// 1 - save in storage html page
 define('HTTP_INFO', 1);// 1 - turn on HTTP info
 /** benefit */
-define('USING_XPATH', 1); // 1 - search using XPATH expressions 0 - search using DiDom expressions
+@define('USING_XPATH', 1); // 1 - search using XPATH expressions 0 - search using DiDom expressions
 /** prepare  output */
 define('PREPARE_BENEFIT', 1); // 1 - true turnOverOutput 0 - true straightOutput
 define('PREP_QUERY_FOR_DB', 1); // 1 - for write in DB , 0 for write in file
 /** DB */
+@define('CONNECT_DB', '0'); // 1 - turn on writing in DB
 define('DB_NAME', 'parser');
 define('TAB_NAME', $tabName);
 

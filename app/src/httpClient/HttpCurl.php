@@ -17,9 +17,14 @@ class HttpCurl implements IHttpClient
         $this->header = $header;
     }
 
-    public function getMultiPages($urls, $proxy = '')
+    /**
+     * @param array $urls
+     * @param string $proxy
+     * @return array
+     */
+    public function getGroupPages($urls, $proxy = '')
     {
-
+        $content = array();
         $mh = curl_multi_init();
 
         foreach ($urls as $i => $url) {
@@ -33,11 +38,13 @@ class HttpCurl implements IHttpClient
         } while ($active); //Пока все соединения не отработают
 
         for ($i = 0; $i < count($urls); $i++) {
-            $result[$i] = curl_multi_getcontent($conn[$i]);
+            $content[$i] = curl_multi_getcontent($conn[$i]);
             curl_multi_remove_handle($mh, $conn[$i]);
 
             $resp = curl_getinfo($conn[$i]);
             $this->errResp($resp['http_code'], $urls[$i]);
+
+            echo '<br>' . $resp['http_code'] . 'ответ сервера<br>';//!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
 //            if (HTTP_INFO == 1) HTTPInfo::Info($page, $conn[$i]);
             curl_close($conn[$i]);
@@ -45,11 +52,16 @@ class HttpCurl implements IHttpClient
 
         curl_multi_close($mh);
 
-        return $result;
+        return $content;
 
 
     }
 
+    /**
+     * @param string $page
+     * @param string $proxy
+     * @return false|resource
+     */
     public function setoptCurl($page, $proxy = '')
     {
         $postData = '';
@@ -107,6 +119,11 @@ class HttpCurl implements IHttpClient
 
     }
 
+    /**
+     * @param string $page
+     * @param string $proxy
+     * @return bool|string
+     */
     public function getPage($page, $proxy = '')
     {
         $content = '';

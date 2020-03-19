@@ -75,11 +75,9 @@ class ProxyChecker
         while (count($this->goodProxy) < 50) {
 
             foreach ($selProxy as $proxy) {
-
                 $this->diffIP($proxy);
 
-//                usleep(500000);
-                echo '<br>' . $z++ . ' цикл checkProxy<br><br>';//!!!!!!!!!!!
+                echo '<br>' . $z++ . ' цикл checkProxy<br>';//!!!!!!!!!!!
             }
             $rowId += 50;
             if ($rowId > 2500) break;

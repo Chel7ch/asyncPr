@@ -1,15 +1,17 @@
 <?php
 
-namespace Proxy;
 
-trait FilterHidemyName
+namespace Prepeare;
+
+
+class PrHidemyName extends PrepInsertQuery implements IPrepeareOutput
 {
     /**
      * prepare  data from hidemy.name for use.
      * @param array $data
      * @return array
      */
-    public function specialPrepOutput($data)
+    public function prepOutput($data)
     {
         /** deff count arrays
          * @var  integer $maxCount number of elements in the largest array  in $data
@@ -24,7 +26,7 @@ trait FilterHidemyName
         /** prepare data   */
         for ($f = 0; $f < $maxCount; $f++) {
             $str = '';
-            if (empty(strip_tags($data[1][$f])) or empty(strip_tags($data[1][$f]))) {
+            if (empty(@strip_tags($data[1][$f])) or empty(@strip_tags($data[2][$f]))) {
                 break;
             } else  $str .= '\'' . strip_tags($data[1][$f]) . ':' . strip_tags($data[2][$f]) . '\', ';
 
@@ -32,8 +34,8 @@ trait FilterHidemyName
 
             (strip_tags($data[4][$f]) == 'Высокая') ? $str .= '\'да\'' . ', ' : $str .= '\'нет\'' . ', ';
 
-            if(empty(strip_tags($data[5][$f]))) $str .= '\'  \' ';
-            else{
+            if (empty(strip_tags($data[5][$f]))) $str .= '\'  \' ';
+            else {
                 /** deleting apostrophes*/
                 $a = str_replace("'", '', strip_tags($data[5][$f]));
                 $str .= '\'' . $a . '\' ';

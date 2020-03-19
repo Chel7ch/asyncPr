@@ -7,7 +7,7 @@ use Facebook\WebDriver\Remote\DesiredCapabilities;
 use Facebook\WebDriver\Remote\RemoteWebDriver;
 use Facebook\WebDriver\WebDriverBy;
 
-class HttpPHPWebDriver implements IHttpClient
+class ProxyPHPWebDriver implements IHttpClient
 {
     use ErrResp, SaveHTMLPage;
     /**
@@ -30,31 +30,30 @@ class HttpPHPWebDriver implements IHttpClient
         $this->driver = RemoteWebDriver::create($host, $desiredCapabilities);
     }
 
-    public function getGroupPages($urls, $proxy = '')
-    {
-        $content = array();
-
-        foreach ($urls as $url) {
-            $content[] = $this->getPage($url);
-//                        sleep(1);
-        }
-
-        return $content;
-    }
-
     public function getPage($page)
     {
         $content = '';
+        static $d = 0;
         try {
-            $this->driver->get($page);
-//            sleep(1);
+
+            if ($d < 3 ) {
+                $this->driver->get($page);
+                sleep(10); //!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+                $d++;
+
+            } else{
+                $this->driver->get($page);
+                sleep(rand(3, 7)); //!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+            }
 
             $this->errResp(http_response_code(), $page);
             $element = $this->driver->findElement(WebDriverBy::tagName('*'));
             $content = $element->getAttribute('outerHTML');
 
+
         } catch (WebDriverException $e) {
         }
+
         $this->saveHTMLPage($content, $page);
 
         return $content;

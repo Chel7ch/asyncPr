@@ -9,12 +9,14 @@
   },
   "autoload": {
     "psr-4": {
+      "App\\": "app/",
       "Src\\": "app/src/",
+      "FilterLinks\\": "app/src/filterLinks/",
       "Client\\": "app/src/httpClient/",
       "Parser\\": "app/src/parser/",
+      "Prepeare\\": "app/src/prepOutput/",
       "DB\\": "app/src/saveResult/",
-      "Proxy\\": "app/src/proxy/",
-      "App\\": "app/"
+      "Proxy\\": "app/src/proxy/"
     }
   }
 }

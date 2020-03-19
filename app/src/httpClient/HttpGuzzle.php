@@ -45,7 +45,7 @@ class HttpGuzzle implements IHttpClient
      * @param string $page URL of HTML page
      * @param string $proxy
      * @return Document
-     * @uses ErrResp, CleanLinks, CleanLinks traits
+     * @uses ErrResp, ICleanLinks, ICleanLinks traits
      */
     public function getPage($page, $proxy = '')
     {
