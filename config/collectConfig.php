@@ -22,6 +22,6 @@ echo '<pre>';
 Prepeare\PrepInsertQuery::$tabName = 'collect_proxy';
 
 $clientHTTP = new Client\ProxyPHPWebDriver($url, 'chrome');
-//$filterLinks = new FilterLinks\ PaginatorCleanLinks();
-//$prepOutput = new Prepeare\ PrHidemyName();
+$filterLinks = new FilterLinks\ PaginatorCleanLinks();
+$prepOutput = new Prepeare\ PrHidemyName();
 $DB = new \DB\DBPdoCRUD(new\DB\MYSQLConnection);

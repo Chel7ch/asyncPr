@@ -18,21 +18,21 @@ class DBPdoCRUD
         return $this->sql->connect();
     }
 
-    public function insertDB($sql = '')
+    public function execInsert($sql)
     {
         $this->connect()->exec($sql);
     }
 
-    public function selDBProxy($rowId, $tab = 'collect_proxy')
+    public function execSelect($sql)
     {
-        static $i = 1;
-//        $sql = 'SELECT id, field1 FROM ' . $tab . ' WHERE id >=' . $i . ' AND id <=' . $i = $i + 50;
-        $sql = 'SELECT  field1 FROM ' . $tab . ' WHERE id >' . $rowId . ' LIMIT 50';
         $results = $this->connect()->query($sql)->fetchAll(PDO::FETCH_COLUMN);
 
-        echo $rowId . 'table<br>';
-
         return $results;
+    }
+
+    public function insertDB($sql = '')
+    {
+        $this->connect()->exec($sql);
     }
 
     public function selectDB($sql = '')

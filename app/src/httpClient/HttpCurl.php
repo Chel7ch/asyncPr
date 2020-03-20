@@ -69,8 +69,6 @@ class HttpCurl implements IHttpClient
         $outputString = 1;
         $followlacation = 1;
         $cookie = COOKIE_FILE . '/cookie.txt';
-//        print_r($proxy);
-//        echo 'dd<br>';
 
         $curl = curl_init();
 
@@ -98,7 +96,7 @@ class HttpCurl implements IHttpClient
 //        curl_setopt($curl, CURLOPT_PROXYTYPE, "CURLPROXY_SOCKS4"); // либо либо CURLPROXY_SOCKS4, CURLPROXY_SOCKS5
 
 
-        curl_setopt($curl, CURLOPT_FOLLOWLOCATION, 1);  // FALSE запрет редиректов
+        curl_setopt($curl, CURLOPT_FOLLOWLOCATION, $followlacation);  // FALSE запрет редиректов
         // работают при CURLOPT_FOLLOWLOCATION = TRUE:
 //        curl_setopt($curl, CURLOPT_MAXREDIRS, 3);  // Максимальное количество принимаемых редиректов
 //        curl_setopt($curl, CURLOPT_POSTREDIR, 2);  // 1 (301 Moved Permanently), 2 (302 Found) и 4 (303 See Other), задают должен ли метод HTTP POST обрабатываться , если произошел указанный тип перенаправления.

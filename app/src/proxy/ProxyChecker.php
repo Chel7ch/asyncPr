@@ -2,51 +2,50 @@
 
 namespace Proxy;
 
-use DB\DBPdoCRUD;
+use Client\IHttpClient;
 
 class ProxyChecker
 {
-    public $goodProxy = array();
+    private static $goodProxy = 0;
+    /** @var IHttpClient */
+    private $client;
+    /** url  for checking proxy */
+//    const CHECKER = 'http://razrabotkaweb.ru/ip.php';
+    const CHECKER = 'http://httpbin.org/ip';
 
-    /**
-     * @param \Client\IHttpClient $client
-     */
-    public function setHttpClient(\Client\IHttpClient $client)
+    /** @param IHttpClient $client */
+    public function setHttpClient(IHttpClient $client)
     {
         $this->client = $client;
-//        $this->url = $this->client->url;
     }
-
 
     /**
-     * @param string $url
-     * @return string HTML doc
+     * @param string $proxy
+     * @return string you IP address
      */
-    public function getPage($url, $proxy = '')
+    public function getPage($proxy = '')
     {
-        return $this->client->getPage($url, $proxy);
+        return $this->client->getPage(self::CHECKER, $proxy);
     }
 
-    public function ownIP($proxy = '', $url = 'http://razrabotkaweb.ru/ip.php')
-//    public function ownIP($proxy = '', $url = 'http://httpbin.org/ip')
-    {
-        return $this->client->getPage($url, $proxy);
-    }
-
-    public function diffIP($proxy = '', $url = 'http://razrabotkaweb.ru/ip.php')
-//    public function diffIP($proxy = '', $url = 'http://httpbin.org/ip')
+    /**
+     * compares your real ip address with the received one
+     * @param string $proxy
+     * @return void
+     */
+    public function diffIP($proxy = '')
     {
         static $own = 0;
         static $ownIp = '';
 
         if ($own == 0) {
-            $ip = $this->ownIP();
+            $ip = $this->getPage();
             preg_match('#\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3}#', $ip, $match);
             $ownIp = implode('', $match);
             $own++;
         }
 
-        $pr = $this->client->getPage($url, $proxy);
+        $pr = $this->getPage($proxy);
 
         if (!empty($pr)) {
             preg_match('#\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3}#', $pr, $match);
@@ -54,40 +53,66 @@ class ProxyChecker
 
             preg_match('#\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3}#', $proxy, $match);
             $proxyIp = implode('', $match);
-            echo '<br>' . $receiveIp . ' ответ прокси вместо ' . $proxyIp;//!!!!!!!!!!!!!!!!!!!!
+
+            echo $pr . '<br>'; //!!!!!!!!!!!!!
 
             if ($receiveIp and $receiveIp != $ownIp) {
-                $this->goodProxy[] = $proxy;
-                echo $proxy .'++++++<br>';
-            }
-        } else echo 'плохой proxy' . $proxy;
+                $this->insertProxy($proxy);
+                self::$goodProxy++;
 
-        return $pr;
+                echo '<br>' . $proxy . ' goodProxy+++++++++++++<br>';//!!!!!
+
+            } elseif ($receiveIp and $receiveIp == $ownIp) {
+                echo '<br>' . $receiveIp . ' ответ прокси, вместо ' . $proxyIp;
+                echo ' Прозрачный прокси: ' . $proxy . ' ----<br>';
+            }
+        } else echo 'Плохой proxy: ' . $proxy . ' Нет ответа.';
     }
 
-    public function checkProxy()
+    /** checking the list proxy  */
+    public function rollingProxy()
     {
         $rowId = 1;
-        $z =1;
+        $z = 1;
 
-        $selProxy = $this->selDBProxy($rowId);
+        $selProxy = $this->selectProxy($rowId);
 
-        while (count($this->goodProxy) < 50) {
+        while (self::$goodProxy < COUNT_GOOD_PROXY) {
 
             foreach ($selProxy as $proxy) {
                 $this->diffIP($proxy);
 
-                echo '<br>' . $z++ . ' цикл checkProxy<br>';//!!!!!!!!!!!
+                echo ' Проверенно: ' . $z++ . ' proxy. Найденно: ' . self::$goodProxy . '<br>';//!!!!!!!!!!!
             }
-            $rowId += 50;
-            if ($rowId > 2500) break;
+            $rowId += REQUEST_AT_TIME;
+            if ($rowId > MAX_CHECKS) break;
 
-            print_r($this->goodProxy);//!!!!!!!!!!!!!!!!!!!!!!
-            echo 'всего<br>';//!!!!!!!!!!!!!!!!!!!!!!
-
-            $selProxy = $this->selDBProxy($rowId);
+            $selProxy = $this->selectProxy($rowId);
         }
+    }
 
+    /**
+     * @param int $rowId
+     * @param string $tab
+     * @return string
+     */
+    public function prepareSelect($rowId, $tab = 'collect_proxy')
+    {
+        $sql = 'SELECT  field1 FROM ' . $tab . ' WHERE id >' . $rowId . ' LIMIT ' . REQUEST_AT_TIME;
+
+        return $sql;
+    }
+
+    /**
+     * @param string $proxy
+     * @param string $tab
+     * @return string
+     */
+    public function prepareInsertGoodProxy($proxy, $tab = 'check_proxy')
+    {
+        $sql = 'INSERT INTO ' . $tab . ' (field1) VALUES(\'' . $proxy . '\')';
+
+        return $sql;
     }
 
     /** ConnectDB  */
@@ -96,10 +121,31 @@ class ProxyChecker
         $this->conn = $db;
     }
 
-    /** SelectDB  */
-    public function selDBProxy($rowId)
+    /** SelectDB
+     * @param int $rowId
+     * @param string $tab
+     * @return array
+     */
+    public function selectProxy($rowId, $tab = 'collect_proxy')
     {
-        return $this->conn->selDBProxy($rowId);
+        $query = $this->prepareSelect($rowId, $tab = 'collect_proxy');
+        return $this->conn->execSelect($query);
     }
 
+    /** InsertDB
+     * @param string $proxy
+     */
+    public function insertProxy($proxy)
+    {
+        $query = $this->prepareInsertGoodProxy($proxy);
+        $this->conn->execInsert($query);
+    }
+
+    /** cleanTable
+     * @param string $nameTable
+     */
+    public function cleanTable($nameTable = 'check_proxy')
+    {
+        $this->conn->cleanTable($nameTable);
+    }
 }
