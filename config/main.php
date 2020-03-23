@@ -18,7 +18,7 @@ define('COOKIE_FILE', DIR_SCRIPT. '/storage/cookies');
 define('LOG_FILE', DIR_SCRIPT. '/storage/logs/php_errors.log');
 define('ERR_RESP_FILE', PROJECT_DIR . '/logs/err_response.csv');
 /** Setting */
-define('MULTI_REQUEST', 2); // number of concurrent requests
+@define('MULTI_REQUEST', 2); // number of concurrent requests
 define('USLEEP', 0.2 *100000); // milliseconds waiting for script
 define('REPEAT_ERR_URL', 0); // number repeat of the repeatErrorURL
 define('REPEAT_ERR_URL_DELAY', 60); // time between repeatErrorURL
@@ -34,7 +34,11 @@ define('PREP_QUERY_FOR_DB', 1); // 1 - for write in DB , 0 for write in file
 @define('CONNECT_DB', '0'); // 1 - turn on writing in DB
 define('DB_NAME', 'parser');
 define('TAB_NAME', $tabName);
-
+/** HTTP*/
+@define('CURL_HTTP_INFO', '0'); // 1 - turn on Curl HTTP_InFo
+@define('PROXY_ON', '0'); // 1 - turn on proxy
+@define('CURL_TIMEOUT', '5');// number of seconds timeout
+@define('CURL_CONNECTTIMEOUT', '4');//number of seconds connect timeout
 
 file_exists(DIR_SCRIPT. '/storage')? :mkdir(DIR_SCRIPT.'/storage');
 file_exists(DIR_SCRIPT. '/storage/logs')? :mkdir(DIR_SCRIPT. '/storage/logs');

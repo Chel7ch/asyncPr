@@ -10,8 +10,8 @@ class ProxyChecker
     /** @var IHttpClient */
     private $client;
     /** url  for checking proxy */
-//    const CHECKER = 'http://razrabotkaweb.ru/ip.php';
-    const CHECKER = 'http://httpbin.org/ip';
+    const CHECKER = 'http://razrabotkaweb.ru/ip.php';
+//    const CHECKER = 'http://httpbin.org/ip';
 
     /** @param IHttpClient $client */
     public function setHttpClient(IHttpClient $client)
@@ -37,6 +37,7 @@ class ProxyChecker
     {
         static $own = 0;
         static $ownIp = '';
+        static $cycle = 1;
 
         if ($own == 0) {
             $ip = $this->getPage();
@@ -47,14 +48,15 @@ class ProxyChecker
 
         $pr = $this->getPage($proxy);
 
-        if (!empty($pr)) {
+        if (strlen($pr) < 60) {
             preg_match('#\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3}#', $pr, $match);
             $receiveIp = implode('', $match);
 
-            preg_match('#\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3}#', $proxy, $match);
-            $proxyIp = implode('', $match);
+            preg_match('#\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3}#', $proxy, $match);//!!!!!
+            $proxyIp = implode('', $match);//!!!!
 
-            echo $pr . '<br>'; //!!!!!!!!!!!!!
+            echo ' Проверенно: ' . $cycle++ . ' proxy. Найденно: ' . self::$goodProxy . '<br>';//!!!!!!!!!!!
+//            \App\Service::writeLog($a);
 
             if ($receiveIp and $receiveIp != $ownIp) {
                 $this->insertProxy($proxy);
@@ -63,30 +65,31 @@ class ProxyChecker
                 echo '<br>' . $proxy . ' goodProxy+++++++++++++<br>';//!!!!!
 
             } elseif ($receiveIp and $receiveIp == $ownIp) {
-                echo '<br>' . $receiveIp . ' ответ прокси, вместо ' . $proxyIp;
-                echo ' Прозрачный прокси: ' . $proxy . ' ----<br>';
+                echo '<br>' . $receiveIp . ' ответ, вместо ' . $proxyIp;//!!!!!!
+                echo ' Прозрачный прокси.----<br>';
             }
-        } else echo 'Плохой proxy: ' . $proxy . ' Нет ответа.';
+        } else echo ' Плохой proxy: ' . $proxy . ' Нет ответа.';
     }
 
     /** checking the list proxy  */
     public function rollingProxy()
     {
         $rowId = 1;
-        $z = 1;
 
+        $countProxy = $this->selectCount();
         $selProxy = $this->selectProxy($rowId);
 
-        while (self::$goodProxy < COUNT_GOOD_PROXY) {
+        while (self::$goodProxy < COUNT_GOOD_PROXY or COUNT_GOOD_PROXY == -1) {
 
             foreach ($selProxy as $proxy) {
                 $this->diffIP($proxy);
-
-                echo ' Проверенно: ' . $z++ . ' proxy. Найденно: ' . self::$goodProxy . '<br>';//!!!!!!!!!!!
             }
             $rowId += REQUEST_AT_TIME;
-            if ($rowId > MAX_CHECKS) break;
 
+            if ($rowId >= $countProxy) {
+                $countProxy = $this->selectCount();
+                if ($rowId >= $countProxy) break;
+            }
             $selProxy = $this->selectProxy($rowId);
         }
     }
@@ -94,51 +97,41 @@ class ProxyChecker
     /**
      * @param int $rowId
      * @param string $tab
-     * @return string
+     * @return array
      */
-    public function prepareSelect($rowId, $tab = 'collect_proxy')
+    public function selectProxy($rowId, $tab = 'collect_proxy')
     {
-        $sql = 'SELECT  field1 FROM ' . $tab . ' WHERE id >' . $rowId . ' LIMIT ' . REQUEST_AT_TIME;
+        $query = 'SELECT  field1 FROM ' . $tab . ' WHERE id >' . $rowId . ' LIMIT ' . REQUEST_AT_TIME;
 
-        return $sql;
+        return $this->conn->execSelect($query);
+    }
+
+    /**
+     * @param string $tab
+     * @return int
+     */
+    public function selectCount($tab = 'collect_proxy')
+    {
+        $query = 'SELECT COUNT(field1) FROM ' . $tab;
+
+        $count = $this->conn->execSelect($query);
+        return (integer)join($count);
     }
 
     /**
      * @param string $proxy
      * @param string $tab
-     * @return string
      */
-    public function prepareInsertGoodProxy($proxy, $tab = 'check_proxy')
+    public function insertProxy($proxy, $tab = 'check_proxy')
     {
-        $sql = 'INSERT INTO ' . $tab . ' (field1) VALUES(\'' . $proxy . '\')';
-
-        return $sql;
+        $query = 'INSERT INTO ' . $tab . ' (field1) VALUES(\'' . $proxy . '\')';
+        $this->conn->execInsert($query);
     }
 
     /** ConnectDB  */
     public function connectDB($db)
     {
         $this->conn = $db;
-    }
-
-    /** SelectDB
-     * @param int $rowId
-     * @param string $tab
-     * @return array
-     */
-    public function selectProxy($rowId, $tab = 'collect_proxy')
-    {
-        $query = $this->prepareSelect($rowId, $tab = 'collect_proxy');
-        return $this->conn->execSelect($query);
-    }
-
-    /** InsertDB
-     * @param string $proxy
-     */
-    public function insertProxy($proxy)
-    {
-        $query = $this->prepareInsertGoodProxy($proxy);
-        $this->conn->execInsert($query);
     }
 
     /** cleanTable

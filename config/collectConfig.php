@@ -12,10 +12,11 @@ $scratch = array(
     '//tbody/tr/td[3]//span[@class="country"]',
 );
 
+define('CONNECT_DB', '1'); // 1 - turn on writing in DB
 define('TAIL',$tail); // part or full path of url
 define('LEVELS',100); // number of Spider pass levels
 define('USING_XPATH', 1); // 1 - search using XPATH expressions 0 - search using DiDom expressions
-define('CONNECT_DB', '1'); // 1 - turn on writing in DB
+
 
 
 echo '<pre>';
