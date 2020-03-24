@@ -13,15 +13,15 @@ abstract class PrepInsertQuery
             return $query;
         }
 
-        if(self::$tabName == TAB_NAME) $firstRow = 'INSERT INTO ' . TAB_NAME . '(links,';
+        if(self::$tabName = TAB_NAME) $firstRow = 'INSERT INTO ' . TAB_NAME . '(links,';
         else $firstRow = 'INSERT INTO ' . self::$tabName . '(';
 
         $tab = $firstRow;
-        $val = ' VALUES';
-        for ($i = 1; $i < TAB_FIELDS; $i++) {
-            $tab .= 'field' . ($i) . ',';
-        }
 
+        for ($i = 0; $i < TAB_FIELDS; $i++) {
+            $tab .= 'field' . ($i+1) . ',';
+        }
+        $val = ' VALUES';
         for ($i = 0; $i < count($data); $i++) {
             $val .= '(' . $data[$i] . '),';
         }

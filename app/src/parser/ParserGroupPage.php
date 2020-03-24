@@ -4,6 +4,7 @@ namespace Parser;
 
 use DiDom\Document;
 use DiDom\Query;
+use Proxy\CookingProxy;
 
 class ParserGroupPage
 {
@@ -20,6 +21,8 @@ class ParserGroupPage
     public $doc;
     public $links = array();
     public $data = array();
+    public static $multiRequest = MULTI_REQUEST;
+    public static $workProxy;
 
     public function __construct()
     {
@@ -51,8 +54,7 @@ class ParserGroupPage
      */
     public function getPages($urls)
     {
-        return $this->client->getGroupPages($urls);
-
+        return $this->client->getGroupPages($urls, self::$workProxy);
     }
 
     /**
@@ -89,9 +91,9 @@ class ParserGroupPage
                 $data[] = $urls[$key];
                 foreach ($scratches as $scratch) {
                     (USING_XPATH == 1) ? $data[] = $page->find($scratch, Query::TYPE_XPATH) : $data[] = $page->find($scratch);
-                    $data = $this->output->prepOutput($data);
-                    $this->data = array_merge($this->data, $data);
                 }
+                $data = $this->output->prepOutput($data);
+                $this->data = array_merge($this->data, $data);
                 unset($data);
             }
             if (PREP_QUERY_FOR_DB == 1) {
@@ -120,6 +122,18 @@ class ParserGroupPage
         return $this->query;
     }
 
+    public function proxyOn()
+    {
+        if (PROXY_ON == 1){
+           $listProxy = $this->selectDB('SELECT  field1 FROM  check_proxy');
+
+            (new CookingProxy)->cook($listProxy);
+            self::$multiRequest = CookingProxy::$multiRequest;
+            self::$workProxy = CookingProxy::$workProxy;
+
+        }else  self::$workProxy = array_fill(0, self::$multiRequest, '');
+    }
+
     /** ConnectDB  */
     public function connectDB($db)
     {
@@ -129,13 +143,13 @@ class ParserGroupPage
     /** InsertDB  */
     public function insertDB($data)
     {
-        $this->conn->insertDB($data);
+        $this->conn->execInsert($data);
     }
 
     /** SelectDB  */
-    public function selectDB()
+    public function selectDB($sql)
     {
-        $this->conn->selectDB();
+        return $this->conn->execSelect($sql);
     }
 
     /** Clean table  */

@@ -16,7 +16,7 @@ class SpiderGroup extends ParserGroupPage
         for ($i = 1; $i <= LEVELS; $i++) {
             $sub = array();
             while ($links) {
-                $urls = array_splice($links, 0, MULTI_REQUEST);
+                $urls = array_splice($links, 0, self::$multiRequest);
                 $subLinks = $this->getLinks($urls, $scratches);
 
                 echo 'уровень  ' . $i . '  _  ' . count($linked) . '  в linked  ' . count($links) . '  в $links <br>';

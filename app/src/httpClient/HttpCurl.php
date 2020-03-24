@@ -2,6 +2,7 @@
 
 namespace Client;
 
+use Proxy\CookingProxy;
 
 class HttpCurl implements IHttpClient
 {
@@ -24,10 +25,12 @@ class HttpCurl implements IHttpClient
      */
     public function getGroupPages($urls, $proxy = '')
     {
+//        print_r($proxy);//!!!!!!!!!!!!!!!!!!!!!!!!!
+//        print_r(CookingProxy::$workProxy);//!!!!!!!!!!!!!!!!!!!!
         $content = array();
         $mh = curl_multi_init();
 
-        if (PROXY_ON == 1 and is_array($proxy)) {
+        if (is_array($proxy)) {
             foreach ($urls as $i => $url) {
                 $conn[$i] = $this->setoptCurl($url, $proxy[$i]);
                 curl_multi_add_handle($mh, $conn[$i]);

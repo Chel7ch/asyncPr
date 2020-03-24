@@ -124,7 +124,7 @@ class ParserPage
     /** InsertDB  */
     public function insertDB($data)
     {
-        $this->conn->insertDB($data);
+        $this->conn->execInsert($data);
     }
 
     /** SelectDB  */

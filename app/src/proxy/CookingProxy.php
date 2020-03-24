@@ -2,21 +2,26 @@
 
 namespace Proxy;
 
+use Parser\ParserGroupPage;
+
 class CookingProxy
 {
     static public $listProxy = array();
     static public $badProxy = array();
-    static public $multiRequest;
+    static public $workProxy = array();
+    static  public $multiRequest;
     private $conn;
 
-    public function cook($count = MULTI_REQUEST)
+    public function cook($listProxy, $count = MULTI_REQUEST)
     {
-        self::$listProxy = $this->selectProxy();
+        self::$listProxy = $listProxy;
 
         if (count(self::$listProxy) >= $count) self::$multiRequest = $count;
         else self::$multiRequest = count(self::$listProxy);
 
-        return array_splice(self::$listProxy, 0, self::$multiRequest);
+        self::$workProxy = array_splice(self::$listProxy, 0, self::$multiRequest);
+
+//        return self::$workProxy;
     }
 
     public function replace($oldProxy, $badPr)
@@ -53,20 +58,12 @@ class CookingProxy
         $this->conn = $db;
     }
 
-    /**
-     * @return string
-     */
-    public function prepareSelect()
-    {
-        return 'SELECT  field1 FROM  check_proxy';
-    }
-
     /** SelectDB
      * @return array
      */
     public function selectProxy()
     {
-        $query = $this->prepareSelect();
+        $query = 'SELECT  field1 FROM  check_proxy';
         return $this->conn->execSelect($query);
     }
 
