@@ -20,9 +20,9 @@ define('USING_XPATH', 1); // 1 - search using XPATH expressions 0 - search using
 
 
 echo '<pre>';
-Prepeare\PrepInsertQuery::$tabName = 'collect_proxy';
-
-$clientHTTP = new Client\ProxyPHPWebDriver($url, 'chrome');
-$filterLinks = new FilterLinks\ PaginatorCleanLinks();
-$prepOutput = new Prepeare\ PrHidemyName();
-$DB = new \DB\DBPdoCRUD(new\DB\MYSQLConnection);
+//Prepeare\PrepInsertQuery::$tabName = 'collect_proxy';
+//
+//$clientHTTP = new Client\ProxyPHPWebDriver($url, 'chrome');
+//$filterLinks = new FilterLinks\ PaginatorCleanLinks();
+//$prepOutput = new Prepeare\ PrHidemyName();
+//$DB = new \DB\DBPdoCRUD(new\DB\MYSQLConnection);

@@ -25,8 +25,7 @@ class HttpCurl implements IHttpClient
      */
     public function getGroupPages($urls, $proxy = '')
     {
-//        print_r($proxy);//!!!!!!!!!!!!!!!!!!!!!!!!!
-//        print_r(CookingProxy::$workProxy);//!!!!!!!!!!!!!!!!!!!!
+
         $content = array();
         $mh = curl_multi_init();
 
@@ -45,29 +44,26 @@ class HttpCurl implements IHttpClient
 
         do {
             curl_multi_exec($mh, $active);
-        } while ($active); //Пока все соединения не отработают
+        } while ($active);
 
         for ($i = 0; $i < count($urls); $i++) {
             $content[$i] = curl_multi_getcontent($conn[$i]);
             curl_multi_remove_handle($mh, $conn[$i]);
 
             $resp = curl_getinfo($conn[$i]);
-            $this->errResp($resp['http_code'], $urls[$i]);
+           @$this->errResp($resp['http_code'], $urls[$i], $proxy[$i]);
 
             if (CURL_HTTP_INFO == 1) {
-                echo '<br>' . $resp['http_code'] . ' ответ сервера';//!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-                echo '<br>' . $resp['total_time'] . ' total_time';//!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-                echo '<br>' . $resp['connect_time'] . ' Время затраченное на установку соединения<br>';//!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+                echo '<br>' . $resp['http_code'] . ' ответ сервера';
+                echo '<br>' . $resp['total_time'] . ' total_time';
+                echo '<br>' . $resp['connect_time'] . ' Время затраченное на установку соединения<br>';
 //            if (HTTP_INFO == 1) HTTPInfo::Info($page, $curl);
             }
-
             curl_close($conn[$i]);
         }
-
         curl_multi_close($mh);
 
         return $content;
-
 
     }
 

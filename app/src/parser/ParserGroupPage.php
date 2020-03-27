@@ -8,7 +8,6 @@ use Proxy\CookingProxy;
 
 class ParserGroupPage
 {
-
     /**
      * @var array scratch  XML expressions for searching on a page. Needs of benefits
      * @var object client HTTP client
@@ -23,11 +22,7 @@ class ParserGroupPage
     public $data = array();
     public static $multiRequest = MULTI_REQUEST;
     public static $workProxy;
-
-    public function __construct()
-    {
-        $this->doc = new Document();
-    }
+    public static $step = 0;
 
     /**
      * @param \Client\IHttpClient $client
@@ -63,8 +58,10 @@ class ParserGroupPage
      */
     protected function parsPages($urls)
     {
+        $pages = array();//!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
         $docs = $this->getPages($urls);
         foreach ($docs as $key => $doc) {
+            if (empty($doc)) break;//!!!!!!!!!!!!!!!!!!!!!!!!!!!!
             $pages[$key] = new Document($doc);
         }
         return $pages;
@@ -83,7 +80,6 @@ class ParserGroupPage
         if (!empty($pages)) {
             foreach ($pages as $key => $page) {
                 $link = $page->find('a::attr(href)');
-
                 $link = $this->filter->cleanLinks($link);
                 $this->links = array_merge($this->links, $link);
                 $this->links = array_values(array_unique($this->links));
@@ -124,14 +120,28 @@ class ParserGroupPage
 
     public function proxyOn()
     {
-        if (PROXY_ON == 1){
-           $listProxy = $this->selectDB('SELECT  field1 FROM  check_proxy');
+        if (PROXY_ON == 1) {
+            $listProxy = $this->selectDB('SELECT  field1 FROM  check_proxy');
+            if (self::$step == 0) CookingProxy::cook($listProxy, 1);
+            else CookingProxy::cook($listProxy);
 
-            (new CookingProxy)->cook($listProxy);
             self::$multiRequest = CookingProxy::$multiRequest;
             self::$workProxy = CookingProxy::$workProxy;
+            CookingProxy::$firstPage = ++self::$step;
 
-        }else  self::$workProxy = array_fill(0, self::$multiRequest, '');
+        } else  {
+            self::$workProxy = array_fill(0, self::$multiRequest, '');
+
+        }
+    }
+
+    public function replaceProxy($badProxy)
+    {
+        CookingProxy::replace($badProxy);
+//        if(empty (CookingProxy::$listProxy)){
+        //todo сделать повторный прогон для  новых good proxy
+        self::$multiRequest = CookingProxy::$multiRequest;
+        self::$workProxy = CookingProxy::$workProxy;
     }
 
     /** ConnectDB  */

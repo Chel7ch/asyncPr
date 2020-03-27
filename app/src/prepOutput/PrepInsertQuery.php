@@ -13,7 +13,7 @@ abstract class PrepInsertQuery
             return $query;
         }
 
-        if(self::$tabName = TAB_NAME) $firstRow = 'INSERT INTO ' . TAB_NAME . '(links,';
+        if(self::$tabName == TAB_NAME) $firstRow = 'INSERT INTO ' . TAB_NAME . '(links,';
         else $firstRow = 'INSERT INTO ' . self::$tabName . '(';
 
         $tab = $firstRow;

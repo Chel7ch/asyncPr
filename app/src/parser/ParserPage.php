@@ -59,6 +59,7 @@ class ParserPage
      */
     public function parsPage($url)
     {
+        $page ='';
         $document = $this->getPage($url);
         if (!empty($document)) {
             $page = $this->doc->loadHtml($document);
