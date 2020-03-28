@@ -4,17 +4,17 @@ namespace Prepeare;
 
 abstract class PrepInsertQuery
 {
-    public static $tabName = TAB_NAME ;
+//    public static $tabName = TAB_NAME ;
 
-    public function prepInsert($data)
+    public function prepInsert($data, $tabName = TAB_NAME )
     {
         $query = '';
         if(empty($data)){
             return $query;
         }
 
-        if(self::$tabName == TAB_NAME) $firstRow = 'INSERT INTO ' . TAB_NAME . '(links,';
-        else $firstRow = 'INSERT INTO ' . self::$tabName . '(';
+        if($tabName == TAB_NAME) $firstRow = 'INSERT INTO ' . TAB_NAME . '(links,';
+        else $firstRow = 'INSERT INTO ' . $tabName . '(';
 
         $tab = $firstRow;
 

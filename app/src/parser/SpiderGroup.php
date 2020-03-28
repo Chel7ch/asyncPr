@@ -2,6 +2,8 @@
 
 namespace Parser;
 
+use Proxy\CookingProxy;
+
 class SpiderGroup extends ParserGroupPage
 {
     use WriteLogs;
@@ -19,13 +21,17 @@ class SpiderGroup extends ParserGroupPage
         for ($i = 1; $i <= LEVELS; $i++) {
             $sub = array();
             while ($links) {
+                
+                $this->multiRequest();
                 $urls = array_splice($links, 0, self::$multiRequest);
                 $subLinks = $this->getLinks($urls, $scratches);
 
-                print_r(self::$workProxy);//!!!!!!!!!!!!!!!!!!!!!!!!!
-                echo '__________workProxy+++++++++++++++++++++++<br>';//!!!!!!!!!!!!!!!!!!!!!!!!!
+//                print_r(self::$workProxy);//!!!!!!!!!!!!!!!!!!!!!!!!!
+//                echo '__________workProxy+++++++++++++++++++++++<br>';//!!!!!!!!!!!!!!!!!!!!!!!!!
                 print_r(self::$multiRequest);//!!!!!!!!!!!!!!!!!!!!!!!!!
                 echo '___________self::$multiRequest++++++++++++++<br>';//!!!!!!!!!!!!!!!!!!!!!!!!!
+//                print_r(CookingProxy::$workProxy);//!!!!!!!!!!!!!!!!!!!!!!!!!
+//                echo '__________CookingProxy::workProxy+++++++++++++++++++++++<br>';//!!!!!!!!!!!!!!!!!!!!!!!!!
                 echo 'уровень  ' . $i . '  _  ' . count($linked) . '  в linked  ' . count($links) . '  в $links <br>';
 
                 $linked = array_merge($linked, $urls);

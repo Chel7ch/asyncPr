@@ -3,6 +3,7 @@
 namespace Proxy;
 
 use Client\IHttpClient;
+use App\Service;
 
 class ProxyGroupChecker
 {
@@ -23,11 +24,12 @@ class ProxyGroupChecker
 
     /**
      * @param mixed $proxy
+     * @param int $request
      * @return array  IP addresses
      */
-    public function getGroupPages($proxy = '', $request = MULTI_REQUEST)
+    public function getGroupPages($proxy = '')
     {
-        $urls = array_fill(0, $request, self::CHECKER);
+        $urls = array_fill(0, MULTI_REQUEST, self::CHECKER);
         return $this->client->getGroupPages($urls, $proxy);
     }
 
@@ -69,7 +71,7 @@ class ProxyGroupChecker
                     echo '<br><br>+++++++  ' . $listProxy[$key] . '________________'.$receiveIp.'<br>';//!!!!!!!!
 
                 } elseif ($receiveIp and $receiveIp == self::$ownIp) {
-                    echo '<br>Ответ: ' . $receiveIp . ' Вместо ' . $listProxy[$key] . ' . Прозрачный прокси.';//!!!!!!
+                    echo '<br>Ответ: ' . $receiveIp . ' Вместо ' . @$listProxy[$key] . ' . Прозрачный прокси.';//!!!!!!
                 }else echo '<br>Плохой proxy '.$listProxy[$key].' Отказ.';
             } else echo '<br>Плохой proxy '.$listProxy[$key].' Отказ';
         }
@@ -146,7 +148,7 @@ class ProxyGroupChecker
             $query .= '(\'' . $pr . '\'),';
         }
         $query = substr($query, 0, -1) . ';';
-        echo '<br>'.$query;//!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+
         $this->conn->execInsert($query);
     }
 

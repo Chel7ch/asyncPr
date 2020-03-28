@@ -17,6 +17,7 @@ define('PROJECT_DIR', DIR_SCRIPT.'/storage/projects/'.PROJECT);
 define('COOKIE_FILE', DIR_SCRIPT. '/storage/cookies');
 define('LOG_FILE', DIR_SCRIPT. '/storage/logs/php_errors.log');
 define('ERR_RESP_FILE', PROJECT_DIR . '/logs/err_response.csv');
+define('ZERO_ERR_RESP_FILE', PROJECT_DIR . '/logs/zero_err_response.csv');
 /** Setting */
 @define('MULTI_REQUEST', 3); // number of concurrent requests
 define('USLEEP', 0.2 *100000); // milliseconds waiting for script

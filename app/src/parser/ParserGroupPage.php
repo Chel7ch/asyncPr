@@ -144,6 +144,11 @@ class ParserGroupPage
         self::$workProxy = CookingProxy::$workProxy;
     }
 
+    public function multiRequest()
+    {
+        if(PROXY_ON == 1) self::$multiRequest = CookingProxy::$multiRequest;
+    }
+
     /** ConnectDB  */
     public function connectDB($db)
     {

@@ -25,10 +25,11 @@ class HttpCurl implements IHttpClient
      */
     public function getGroupPages($urls, $proxy = '')
     {
-
         $content = array();
         $mh = curl_multi_init();
 
+        if (!empty(CookingProxy::$workProxy)) $proxy = CookingProxy::$workProxy;
+        print_r($proxy); echo '__________$proxy';
         if (is_array($proxy)) {
             foreach ($urls as $i => $url) {
                 $conn[$i] = $this->setoptCurl($url, $proxy[$i]);
@@ -51,20 +52,25 @@ class HttpCurl implements IHttpClient
             curl_multi_remove_handle($mh, $conn[$i]);
 
             $resp = curl_getinfo($conn[$i]);
-           @$this->errResp($resp['http_code'], $urls[$i], $proxy[$i]);
+            $this->curlInfo($resp);
+            @$this->errResp($resp['http_code'], $urls[$i], $proxy[$i]);
 
-            if (CURL_HTTP_INFO == 1) {
-                echo '<br>' . $resp['http_code'] . ' ответ сервера';
-                echo '<br>' . $resp['total_time'] . ' total_time';
-                echo '<br>' . $resp['connect_time'] . ' Время затраченное на установку соединения<br>';
-//            if (HTTP_INFO == 1) HTTPInfo::Info($page, $curl);
-            }
             curl_close($conn[$i]);
         }
         curl_multi_close($mh);
 
         return $content;
 
+    }
+
+    public function curlInfo($resp)
+    {
+        if (CURL_HTTP_INFO == 1) {
+            echo '<br>' . $resp['http_code'] . ' ответ сервера';
+            echo '<br>' . $resp['total_time'] . ' total_time';
+            echo '<br>' . $resp['connect_time'] . ' Время затраченное на установку соединения<br>';
+//          HTTPInfo::Info($page, $curl);
+        }
     }
 
     /**
@@ -131,8 +137,7 @@ class HttpCurl implements IHttpClient
      * @param string $proxy
      * @return bool|string
      */
-    public
-    function getPage($page, $proxy = '')
+    public function getPage($page, $proxy = '')
     {
         $content = '';
         $curl = $this->setoptCurl($page, $proxy);
@@ -140,15 +145,9 @@ class HttpCurl implements IHttpClient
             $content = curl_exec($curl);
 
             $resp = curl_getinfo($curl);
+            $this->curlInfo($resp);
+
             $this->errResp($resp['http_code'], $page);
-
-            if (CURL_HTTP_INFO == 1) {
-                echo '<br>' . $resp['http_code'] . ' ответ сервера<br>';//!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-                echo $resp['total_time'] . ' total_time<br>';//!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-                echo $resp['connect_time'] . ' Время затраченное на установку соединения<br>';//!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-//            if (HTTP_INFO == 1) HTTPInfo::Info($page, $curl);
-            }
-
 
         } catch (RequestException $e) {
         }
@@ -160,8 +159,7 @@ class HttpCurl implements IHttpClient
 
     }
 
-    public
-    function postPage($page, $postData)
+    public function postPage($page, $postData)
     {
     }
 
