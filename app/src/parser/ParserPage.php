@@ -4,8 +4,9 @@ namespace Parser;
 
 use DiDom\Document;
 use DiDom\Query;
+use Proxy\CookingProxy;
 
-class ParserPage
+class ParserPage extends ParserRoutine
 {
 
     /**
@@ -19,29 +20,12 @@ class ParserPage
     public $connect;
     public $doc;
     public $links = array();
+    public static $workProxy;
+    public static $step = 0;
 
     public function __construct()
     {
         $this->doc = new Document();
-    }
-
-    /**
-     * @param \Client\IHttpClient $client
-     */
-    public function setHttpClient(\Client\IHttpClient $client)
-    {
-        $this->client = $client;
-        $this->url = $this->client->url;
-    }
-
-    public function setCleanLinks(\FilterLinks\ICleanLinks $cleanLinks)
-    {
-        $this->filter = $cleanLinks;
-    }
-
-    public function setOutput(\Prepeare\IPrepeareOutput $output)
-    {
-        $this->output = $output;
     }
 
     /**
@@ -59,7 +43,7 @@ class ParserPage
      */
     public function parsPage($url)
     {
-        $page ='';
+        $page = '';
         $document = $this->getPage($url);
         if (!empty($document)) {
             $page = $this->doc->loadHtml($document);
@@ -116,28 +100,28 @@ class ParserPage
         return $this->query;
     }
 
-    /** ConnectDB  */
-    public function connectDB($db)
+    public function proxyOn()
     {
-        $this->conn = $db;
+        static $i = 0;
+        if (PROXY_ON == 1) {
+            $listProxy = $this->selectDB('SELECT  field1 FROM  check_proxy');
+            if ($i == 0) {
+                CookingProxy::cook($listProxy, 1);
+                self::$workProxy = CookingProxy::$workProxy;
+                CookingProxy::$firstPage = self::$step;
+                $i++;
+            }else{
+                CookingProxy::$listP = $listProxy;
+                CookingProxy::$firstPage = self::$step;
+                CookingProxy::$attemptWork = 0;
+            }
+        }
     }
 
-    /** InsertDB  */
-    public function insertDB($data)
+    public function replaceProxy($badProxy)
     {
-        $this->conn->execInsert($data);
-    }
-
-    /** SelectDB  */
-    public function selectDB()
-    {
-        $this->conn->selectDB();
-    }
-
-    /** Clean table  */
-    public function cleanTable($nameTable)
-    {
-        $this->conn->cleanTable($nameTable);
+        CookingProxy::replace($badProxy);
+        self::$workProxy = CookingProxy::$workProxy;
     }
 
     public function close()

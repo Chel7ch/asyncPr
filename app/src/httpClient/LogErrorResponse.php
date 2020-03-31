@@ -5,11 +5,11 @@ namespace Client;
 use Parser\SpiderGroup;
 use Proxy\CookingProxy;
 
-trait ErrResp
+trait LogErrorResponse
 {
     public static $zeroUrl = array();
 
-    public function errResp($response, $url, $proxy = '')
+    public function errorResponse($response, $url, $proxy = '')
     {
         if ($response != 200) {
             if ($response == 0 and CookingProxy::$firstPage != 0) {
@@ -20,9 +20,8 @@ trait ErrResp
 
                     $errReq = array($url);
                     $this->writeErrResp($errReq, ZERO_ERR_RESP_FILE);
-
                 }
-            } else {
+            } elseif ($response != 0) {
                 $errReq = array($response, $url);
                 $this->writeErrResp($errReq, ERR_RESP_FILE);
             }
@@ -39,16 +38,17 @@ trait ErrResp
 
     public function readErrorURL($nameFile)//!!!!!!!!!!!!!
     {
-        $list =array();
+        $list = array();
+
         if (file_exists($nameFile) && ($fp = fopen($nameFile, "r")) !== FALSE) {
             while (!feof($fp)) {
                 $str = htmlentities(fgets($fp));
                 if ($str != '') $list[] = strstr($str, 'http');
             }
             fclose($fp);
-//            file_put_contents($nameFile, '');
+            file_put_contents($nameFile, '');
 
-//            $list = str_replace(array("\r","\n"),"",$list);
+            $list = str_replace(array("\r","\n"),"",$list);
             $list = array_values(array_unique(array_diff($list, array('', 0, null))));
 
             return $list;

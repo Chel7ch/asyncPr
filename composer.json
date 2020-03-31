@@ -14,7 +14,7 @@
       "FilterLinks\\": "app/src/filterLinks/",
       "Client\\": "app/src/httpClient/",
       "Parser\\": "app/src/parser/",
-      "Prepeare\\": "app/src/prepOutput/",
+      "Prepare\\": "app/src/prepOutput/",
       "DB\\": "app/src/saveResult/",
       "Proxy\\": "app/src/proxy/"
     }

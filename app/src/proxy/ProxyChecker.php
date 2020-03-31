@@ -6,6 +6,7 @@ use Client\IHttpClient;
 
 class ProxyChecker
 {
+    const REQUEST_AT_TIME = 50;
     private static $goodProxy = 0;
     /** @var IHttpClient */
     private $client;
@@ -84,7 +85,7 @@ class ProxyChecker
             foreach ($selProxy as $proxy) {
                 $this->diffIP($proxy);
             }
-            $rowId += REQUEST_AT_TIME;
+            $rowId += self::REQUEST_AT_TIME;
 
             if ($rowId >= $countProxy) {
                 $countProxy = $this->selectCount();
@@ -101,7 +102,7 @@ class ProxyChecker
      */
     public function selectProxy($rowId, $tab = 'collect_proxy')
     {
-        $query = 'SELECT  field1 FROM ' . $tab . ' WHERE id >' . $rowId . ' LIMIT ' . REQUEST_AT_TIME;
+        $query = 'SELECT  field1 FROM ' . $tab . ' WHERE id >' . $rowId . ' LIMIT ' . self::REQUEST_AT_TIME;
 
         return $this->conn->execSelect($query);
     }

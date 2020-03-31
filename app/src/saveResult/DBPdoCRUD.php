@@ -30,10 +30,10 @@ class DBPdoCRUD
         return $results;
     }
 
-    public function insertDB($sql = '')
-    {
-        $this->connect()->exec($sql);
-    }
+//    public function insertDB($sql = '')
+//    {
+//        $this->connect()->exec($sql);
+//    }
 
     public function selectDB($sql = '')
     {

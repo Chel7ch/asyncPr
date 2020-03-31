@@ -1,8 +1,8 @@
 <?php
 
-namespace Prepeare;
+namespace Prepare;
 
-class TurnOverOutput  extends  PrepInsertQuery implements IPrepeareOutput
+class TurnOverOutput  extends  PrepInsertQuery implements IPrepareOutput
 {
 
     public function prepOutput($data)

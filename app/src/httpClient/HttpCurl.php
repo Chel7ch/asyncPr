@@ -6,7 +6,8 @@ use Proxy\CookingProxy;
 
 class HttpCurl implements IHttpClient
 {
-    use ErrResp, SaveHTMLPage;
+    use LogErrorResponse, SaveHTMLPage;
+
     public $url;
     private $header;
     private $page;
@@ -29,7 +30,9 @@ class HttpCurl implements IHttpClient
         $mh = curl_multi_init();
 
         if (!empty(CookingProxy::$workProxy)) $proxy = CookingProxy::$workProxy;
-        print_r($proxy); echo '__________$proxy';
+        print_r($proxy);
+        echo '__________$proxy';//!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+
         if (is_array($proxy)) {
             foreach ($urls as $i => $url) {
                 $conn[$i] = $this->setoptCurl($url, $proxy[$i]);
@@ -53,9 +56,10 @@ class HttpCurl implements IHttpClient
 
             $resp = curl_getinfo($conn[$i]);
             $this->curlInfo($resp);
-            @$this->errResp($resp['http_code'], $urls[$i], $proxy[$i]);
+            @$this->errorResponse($resp['http_code'], $urls[$i], $proxy[$i]);
 
             curl_close($conn[$i]);
+            $this->saveHTMLPage($content[$i], $urls[$i]);
         }
         curl_multi_close($mh);
 
@@ -107,8 +111,8 @@ class HttpCurl implements IHttpClient
         curl_setopt($curl, CURLOPT_REFERER, 'http://diesel.elcat.kg/'); // Содерж. заг-а "Referer:" -URL с какой страницы пришли
 
         curl_setopt($curl, CURLOPT_PROXY, $proxy); // IP HTTP-прокси, через который будут направляться запросы.
-//        curl_setopt($curl, CURLOPT_HTTPPROXYTUNNEL, 1); //
-//        curl_setopt($curl, CURLOPT_PROXYTYPE, "CURLPROXY_SOCKS4"); // либо либо CURLPROXY_SOCKS4, CURLPROXY_SOCKS5
+        curl_setopt($curl, CURLOPT_HTTPPROXYTUNNEL, 0); //
+        curl_setopt($curl, CURLOPT_PROXYTYPE, "CURLPROXY_SOCKS4"); // либо либо CURLPROXY_SOCKS4, CURLPROXY_SOCKS5
 
 
         curl_setopt($curl, CURLOPT_FOLLOWLOCATION, $followlacation);  // FALSE запрет редиректов
@@ -140,6 +144,17 @@ class HttpCurl implements IHttpClient
     public function getPage($page, $proxy = '')
     {
         $content = '';
+        if (!empty(CookingProxy::$workProxy)) $proxy = join(CookingProxy::$workProxy);
+//        echo '__________getPage curl___________________<br>';
+//        print_r($proxy);
+//        echo 'curl__________$proxy';//!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+//        print_r(CookingProxy::$workProxy);
+//        echo 'curl__________$workProxy';//!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+//        print_r(CookingProxy::$listProxy);
+//        echo 'curl__________$listProxy';//!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+//        print_r(CookingProxy::$badProxy);
+//        echo 'curl__________$badProxy';//!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+
         $curl = $this->setoptCurl($page, $proxy);
         try {
             $content = curl_exec($curl);
@@ -147,7 +162,7 @@ class HttpCurl implements IHttpClient
             $resp = curl_getinfo($curl);
             $this->curlInfo($resp);
 
-            $this->errResp($resp['http_code'], $page);
+            $this->errorResponse($resp['http_code'], $page, $proxy);
 
         } catch (RequestException $e) {
         }

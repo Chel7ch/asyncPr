@@ -1,10 +1,11 @@
 <?php
 
-namespace Prepeare;
+namespace Prepare;
 
 abstract class PrepInsertQuery
 {
 //    public static $tabName = TAB_NAME ;
+    public static $tabName;
 
     public function prepInsert($data, $tabName = TAB_NAME )
     {

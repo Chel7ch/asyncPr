@@ -1,10 +1,10 @@
 <?php
 
 
-namespace Prepeare;
+namespace Prepare;
 
 
-class PrHidemyName extends PrepInsertQuery implements IPrepeareOutput
+class PrHidemyName extends PrepInsertQuery implements IPrepareOutput
 {
     /**
      * prepare  data from hidemy.name for use.
@@ -46,14 +46,14 @@ class PrHidemyName extends PrepInsertQuery implements IPrepeareOutput
         return $dt;
     }
 
-    public function prepInsert($data)
+    public function prepInsert($data, $tabName = 'collect_proxy')
     {
         $query = '';
-        if(empty($data)){
+        if (empty($data)) {
             return $query;
         }
 
-        $tab = $firstRow = 'INSERT INTO collect_proxy (';
+        $tab = $firstRow = 'INSERT INTO ' . $tabName . '(';
 
         for ($i = 1; $i < TAB_FIELDS; $i++) {
             $tab .= 'field' . ($i) . ',';

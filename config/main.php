@@ -21,8 +21,7 @@ define('ZERO_ERR_RESP_FILE', PROJECT_DIR . '/logs/zero_err_response.csv');
 /** Setting */
 @define('MULTI_REQUEST', 3); // number of concurrent requests
 define('USLEEP', 0.2 *100000); // milliseconds waiting for script
-define('REPEAT_ERR_URL', 0); // number repeat of the repeatErrorURL
-define('REPEAT_ERR_URL_DELAY', 60); // time between repeatErrorURL
+define('FORCE_READ_ERR_RESPONSE_URL', 3); // the number of retry to reading pages with a error response from the server
 @define('LEVELS', 1); // number of Spider pass levels
 define('SAVE_HTML_PAGE', 0);// 1 - save in storage html page
 define('HTTP_INFO', 1);// 1 - turn on HTTP info

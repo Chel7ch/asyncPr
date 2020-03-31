@@ -2,13 +2,27 @@
 
 namespace Parser;
 
+use DiDom\Document;
 use DiDom\Query;
 
 /**
  * Class ReadSaveFiles crawling files from storage/progects/../htmlPages
  */
-class ReadSaveFiles extends ParserPage
+class ReadSaveFiles extends ParserRoutine
 {
+    public function __construct()
+    {
+        $this->doc = new Document();
+    }
+    /**
+     * @param  $fName
+     * @return \DiDom\Document
+     */
+    private function getFile($fName)
+    {
+        return $this->doc->loadHtmlfile($fName);
+    }
+
     /**
      * Crawling files from  storage/progects/../htmlPages
      * @param $scratch
@@ -42,7 +56,7 @@ class ReadSaveFiles extends ParserPage
      * @param array $scratches
      * @return void
      */
-    public function parsFile($page, $url, $scratches = [])
+    private function parsFile($page, $url, $scratches = [])
     {
         $data[] = $url;
         foreach ($scratches as $scratch) {
@@ -58,13 +72,18 @@ class ReadSaveFiles extends ParserPage
         }
     }
 
-    /**
-     * @param  $fName
-     * @return \DiDom\Document
-     */
-    public function getFile($fName)
+    public function getBenefit($fname, $scratches)
     {
-        return $this->doc->loadHtmlfile($fName);
+        $doc = PROJECT_DIR . '/htmlPages/' . $fname;
+        $page = $this->getFile($doc);
+        $this->parsFile($page,$fname, $scratches);
+        return $this->data;
+    }
+
+    public function getQuery($fname, $scratches)
+    {
+        $this->getBenefit($fname, $scratches);
+        return $this->query;
     }
 
 }

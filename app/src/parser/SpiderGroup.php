@@ -18,6 +18,7 @@ class SpiderGroup extends ParserGroupPage
         }
         self::$step++;
         $this->proxyOn();
+
         for ($i = 1; $i <= LEVELS; $i++) {
             $sub = array();
             while ($links) {
@@ -26,12 +27,7 @@ class SpiderGroup extends ParserGroupPage
                 $urls = array_splice($links, 0, self::$multiRequest);
                 $subLinks = $this->getLinks($urls, $scratches);
 
-//                print_r(self::$workProxy);//!!!!!!!!!!!!!!!!!!!!!!!!!
-//                echo '__________workProxy+++++++++++++++++++++++<br>';//!!!!!!!!!!!!!!!!!!!!!!!!!
-                print_r(self::$multiRequest);//!!!!!!!!!!!!!!!!!!!!!!!!!
-                echo '___________self::$multiRequest++++++++++++++<br>';//!!!!!!!!!!!!!!!!!!!!!!!!!
-//                print_r(CookingProxy::$workProxy);//!!!!!!!!!!!!!!!!!!!!!!!!!
-//                echo '__________CookingProxy::workProxy+++++++++++++++++++++++<br>';//!!!!!!!!!!!!!!!!!!!!!!!!!
+                print_r(self::$multiRequest);echo '___________self::$multiRequest++++++++++++++<br>';//!!!!
                 echo 'уровень  ' . $i . '  _  ' . count($linked) . '  в linked  ' . count($links) . '  в $links <br>';
 
                 $linked = array_merge($linked, $urls);
@@ -49,8 +45,8 @@ class SpiderGroup extends ParserGroupPage
             sleep(REPEAT_ERR_URL_DELAY);
         }
 
-        $this->writelogs($links, 'links');
-        $this->writelogs($linked, 'linked');
+//        $this->writelogs($links, 'links');
+//        $this->writelogs($linked, 'linked');
 
         echo '<pre>';
         echo '<br>links<br>';
@@ -60,6 +56,11 @@ class SpiderGroup extends ParserGroupPage
         echo '</pre>';
     }
 
+    /**
+     * @param array $urls
+     * @param array $scratches
+     * @return array
+     */
     public function firstPage($urls, $scratches = [])
     {
         $this->proxyOn();

@@ -1,8 +1,8 @@
 <?php
 
-namespace Prepeare;
+namespace Prepare;
 
-class StraightOutput extends  PrepInsertQuery implements IPrepeareOutput
+class StraightOutput extends  PrepInsertQuery implements IPrepareOutput
 {
     public function prepOutput($data)
     {

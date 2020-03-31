@@ -6,7 +6,7 @@ use DiDom\Document;
 use DiDom\Query;
 use Proxy\CookingProxy;
 
-class ParserGroupPage
+class ParserGroupPage extends ParserRoutine
 {
     /**
      * @var array scratch  XML expressions for searching on a page. Needs of benefits
@@ -23,25 +23,6 @@ class ParserGroupPage
     public static $multiRequest = MULTI_REQUEST;
     public static $workProxy;
     public static $step = 0;
-
-    /**
-     * @param \Client\IHttpClient $client
-     */
-    public function setHttpClient(\Client\IHttpClient $client)
-    {
-        $this->client = $client;
-        $this->url = $this->client->url;
-    }
-
-    public function setCleanLinks(\FilterLinks\ICleanLinks $cleanLinks)
-    {
-        $this->filter = $cleanLinks;
-    }
-
-    public function setOutput(\Prepeare\IPrepeareOutput $output)
-    {
-        $this->output = $output;
-    }
 
     /**
      * @param array $urls
@@ -127,11 +108,10 @@ class ParserGroupPage
 
             self::$multiRequest = CookingProxy::$multiRequest;
             self::$workProxy = CookingProxy::$workProxy;
-            CookingProxy::$firstPage = ++self::$step;
+            CookingProxy::$firstPage = self::$step;
 
-        } else  {
+        } else {
             self::$workProxy = array_fill(0, self::$multiRequest, '');
-
         }
     }
 
@@ -146,31 +126,7 @@ class ParserGroupPage
 
     public function multiRequest()
     {
-        if(PROXY_ON == 1) self::$multiRequest = CookingProxy::$multiRequest;
-    }
-
-    /** ConnectDB  */
-    public function connectDB($db)
-    {
-        $this->conn = $db;
-    }
-
-    /** InsertDB  */
-    public function insertDB($data)
-    {
-        $this->conn->execInsert($data);
-    }
-
-    /** SelectDB  */
-    public function selectDB($sql)
-    {
-        return $this->conn->execSelect($sql);
-    }
-
-    /** Clean table  */
-    public function cleanTable($nameTable)
-    {
-        $this->conn->cleanTable($nameTable);
+        if (PROXY_ON == 1) self::$multiRequest = CookingProxy::$multiRequest;
     }
 
 }
