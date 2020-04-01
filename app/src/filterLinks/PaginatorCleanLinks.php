@@ -9,7 +9,6 @@ class PaginatorCleanLinks implements ICleanLinks
     {
         $link = array();
         foreach ($links as $urn) {
-
             $urn = urldecode(trim($urn));
 
             // убираем якоря
@@ -23,9 +22,7 @@ class PaginatorCleanLinks implements ICleanLinks
                 $link[] = URL . $urn;
             }
         }
-
         if (!empty($link)) $link = array_values(array_unique($link));
-
         return $link;
     }
 }

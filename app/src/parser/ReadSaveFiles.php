@@ -14,11 +14,12 @@ class ReadSaveFiles extends ParserRoutine
     {
         $this->doc = new Document();
     }
+
     /**
      * @param  $fName
      * @return \DiDom\Document
      */
-    private function getFile($fName)
+    public function getFile($fName)
     {
         return $this->doc->loadHtmlfile($fName);
     }
@@ -60,23 +61,27 @@ class ReadSaveFiles extends ParserRoutine
     {
         $data[] = $url;
         foreach ($scratches as $scratch) {
-            (USING_XPATH == 1) ? $data[] = $page->find($scratch, Query::TYPE_XPATH) : $data[] = $page->find($scratch);
-        }
+            (USING_XPATH == 1) ? $dt = $page->find($scratch, Query::TYPE_XPATH) : $dt = $page->find($scratch);
+            $data[] = $this->filter->cleanLinks($dt);
+         }
+
         $this->data = $this->output->prepOutput($data);
 
-        if (PREP_QUERY_FOR_DB == 1) {
+        if (CONNECT_DB == 1) {
+            if (empty($this->data)) return;
             $this->query = $this->output->prepInsert($this->data);
-
-            if (empty($this->query)) return;
-            if (CONNECT_DB == 1) $this->insertDB($this->query);
-        }
+            $this->insertDB($this->query);
+        }else (new \DB\FileExecute)->execInsert($this->data);
     }
 
     public function getBenefit($fname, $scratches)
     {
         $doc = PROJECT_DIR . '/htmlPages/' . $fname;
+        $trans = array(".html" => "", "~~" => "/");
+        $url = strtr($fname, $trans);
+
         $page = $this->getFile($doc);
-        $this->parsFile($page,$fname, $scratches);
+        $this->parsFile($page, $url, $scratches);
         return $this->data;
     }
 

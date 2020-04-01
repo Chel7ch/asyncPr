@@ -14,7 +14,7 @@ abstract class PrepInsertQuery
             return $query;
         }
 
-        if($tabName == TAB_NAME) $firstRow = 'INSERT INTO ' . TAB_NAME . '(links,';
+        if($tabName == TAB_NAME and OUTPUT_WITH_URL == 1) $firstRow = 'INSERT INTO ' . TAB_NAME . '(links,';
         else $firstRow = 'INSERT INTO ' . $tabName . '(';
 
         $tab = $firstRow;

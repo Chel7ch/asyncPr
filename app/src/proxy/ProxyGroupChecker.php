@@ -103,7 +103,7 @@ class ProxyGroupChecker
                 $goodProxy = $goodProxy + count($good);//!!!!!!!!!!!
             }
 
-            echo '<br>Проверенно: ' . $cycle . ' proxy. Найденно: ' . $goodProxy . '<br>';//!!!!!!!!!!!
+            echo '<br><br> Проверенно: ' . $cycle . ' proxy. Найденно: ' . $goodProxy . '<br>';//!!!!!!!!!!!
 
             $rowId += self::REQUEST_AT_TIME;
 

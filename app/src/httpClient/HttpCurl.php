@@ -111,7 +111,7 @@ class HttpCurl implements IHttpClient
         curl_setopt($curl, CURLOPT_REFERER, 'http://diesel.elcat.kg/'); // Содерж. заг-а "Referer:" -URL с какой страницы пришли
 
         curl_setopt($curl, CURLOPT_PROXY, $proxy); // IP HTTP-прокси, через который будут направляться запросы.
-        curl_setopt($curl, CURLOPT_HTTPPROXYTUNNEL, 0); //
+        curl_setopt($curl, CURLOPT_HTTPPROXYTUNNEL, 1); //
         curl_setopt($curl, CURLOPT_PROXYTYPE, "CURLPROXY_SOCKS4"); // либо либо CURLPROXY_SOCKS4, CURLPROXY_SOCKS5
 
 

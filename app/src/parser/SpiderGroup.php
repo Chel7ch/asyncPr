@@ -6,7 +6,7 @@ use Proxy\CookingProxy;
 
 class SpiderGroup extends ParserGroupPage
 {
-    use WriteLogs;
+    use WriteLogs,\Client\LogErrorResponse;
 
     public function spider($urls, $scratches = [], $links = [], $linked = [])
     {
@@ -20,33 +20,14 @@ class SpiderGroup extends ParserGroupPage
         $this->proxyOn();
 
         for ($i = 1; $i <= LEVELS; $i++) {
-            $sub = array();
-            while ($links) {
-                
-                $this->multiRequest();
-                $urls = array_splice($links, 0, self::$multiRequest);
-                $subLinks = $this->getLinks($urls, $scratches);
-
-                print_r(self::$multiRequest);echo '___________self::$multiRequest++++++++++++++<br>';//!!!!
-                echo 'уровень  ' . $i . '  _  ' . count($linked) . '  в linked  ' . count($links) . '  в $links <br>';
-
-                $linked = array_merge($linked, $urls);
-                $sub = array_unique(array_merge($sub, $subLinks));
-                $sub = array_diff($sub, $links, $linked);
-                usleep(USLEEP);
-            }
-            $links = $sub;
-            unset($sub);
+            list($links, $linked) = $this->parsOneLevel($links, $linked, $scratches);
+            if (PROXY_ON == 1) list($links, $linked) = $this->forceReadErrResponse($links, $linked, $scratches,ZERO_ERR_RESP_FILE);
         }
 
-// todo заставить работать правильно ( сделать if !empty)
-        for ($e = 0; $e < REPEAT_ERR_URL; $e++) {
-            $this->readErrorURL();
-            sleep(REPEAT_ERR_URL_DELAY);
-        }
+        list($links, $linked) = $this->forceReadErrResponse($links, $linked, $scratches, ERR_RESP_FILE);
 
-//        $this->writelogs($links, 'links');
-//        $this->writelogs($linked, 'linked');
+        $this->writelogs($links, 'links');
+        $this->writelogs($linked, 'linked');
 
         echo '<pre>';
         echo '<br>links<br>';
@@ -72,5 +53,44 @@ class SpiderGroup extends ParserGroupPage
             $links = $this->getLinks($urls, $scratches);
         }
         return $links;
+    }
+
+    public function parsOneLevel($links, $linked, $scratches)
+    {
+        $sub = array();
+        while ($links) {
+
+            $this->multiRequest();
+            $urls = array_splice($links, 0, self::$multiRequest);
+            $subLinks = $this->getLinks($urls, $scratches);
+
+            print_r(self::$multiRequest);echo '___________self::$multiRequest++++++++++++++<br>';//!!!!
+            echo 'уровень  ' . '  _  ' . count($linked) . '  в linked  ' . count($links) . '  в $links <br>';
+
+            $linked = array_merge($linked, $urls);
+            $sub = array_unique(array_merge($sub, $subLinks));
+            $sub = array_diff($sub, $links, $linked);
+            usleep(USLEEP);
+        }
+
+        return array($sub, $linked);
+    }
+
+    public function forceReadErrResponse($links, $linked, $scratches,$fname)
+    {
+
+        for ($i = 1; $i <= FORCE_READ_ERR_RESPONSE_URL; $i++) {
+            $errorURL = $this->readErrorURL($fname);
+            if (empty($errorURL)){
+                return array($links, $linked);
+            }
+            else {
+                $linked = array_diff($linked, $errorURL);
+
+                list($ln, $linked) = $this->parsOneLevel($errorURL, $linked, $scratches);
+                $links = array_merge($links, $ln);
+            }
+        }
+        return array($links, $linked);
     }
 }

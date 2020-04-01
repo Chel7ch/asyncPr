@@ -23,10 +23,11 @@ define('ZERO_ERR_RESP_FILE', PROJECT_DIR . '/logs/zero_err_response.csv');
 define('USLEEP', 0.2 *100000); // milliseconds waiting for script
 define('FORCE_READ_ERR_RESPONSE_URL', 3); // the number of retry to reading pages with a error response from the server
 @define('LEVELS', 1); // number of Spider pass levels
-define('SAVE_HTML_PAGE', 0);// 1 - save in storage html page
+@define('SAVE_HTML_PAGE', 1);// 1 - save in storage html page
 define('HTTP_INFO', 1);// 1 - turn on HTTP info
 /** benefit */
 @define('USING_XPATH', 1); // 1 - search using XPATH expressions 0 - search using DiDom expressions
+@define('OUTPUT_WITH_URL', '0'); // 1 - turn on add a column with url to output
 /** prepare  output */
 define('PREPARE_BENEFIT', 1); // 1 - true turnOverOutput 0 - true straightOutput
 define('PREP_QUERY_FOR_DB', 1); // 1 - for write in DB , 0 for write in file

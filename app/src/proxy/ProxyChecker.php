@@ -56,8 +56,7 @@ class ProxyChecker
             preg_match('#\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3}#', $proxy, $match);//!!!!!
             $proxyIp = implode('', $match);//!!!!
 
-            echo ' Проверенно: ' . $cycle++ . ' proxy. Найденно: ' . self::$goodProxy . '<br>';//!!!!!!!!!!!
-//            \App\Service::writeLog($a);
+            echo '<br> Проверенно: ' . ++$cycle . ' proxy. Найденно: ' . self::$goodProxy . '<br>';//!!!!!!!!!!!
 
             if ($receiveIp and $receiveIp != $ownIp) {
                 $this->insertProxy($proxy);

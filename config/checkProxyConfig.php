@@ -13,4 +13,4 @@ define('MULTI_REQUEST', 10); // number of concurrent requests
 
 
 $clientHTTP = new Client\HttpCurl($url, $header);
-$DB = new \DB\DBPdoCRUD(new\DB\MYSQLConnection);
+$DB = new \DB\DBPdoExecute(new\DB\MYSQLConnection);

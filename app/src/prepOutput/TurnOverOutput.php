@@ -13,6 +13,7 @@ class TurnOverOutput  extends  PrepInsertQuery implements IPrepareOutput
          */
         $maxCount = 0;
         $numbArray = 0;
+        $str ='';
         $dt = array();
         foreach ($data as $a) {
             $numbArray++;
@@ -21,7 +22,8 @@ class TurnOverOutput  extends  PrepInsertQuery implements IPrepareOutput
         }
         /** prepare data   */
         for ($f = 0; $f < $maxCount; $f++) {
-            $str = '\'' . $data[0] . '\', ';
+            (OUTPUT_WITH_URL == 1)? $str = '\'' . $data[0] . '\', ': $str ='' ;
+
             for ($i = 1; $i < $numbArray; $i++) {
 
                 if (empty(@strip_tags($data[$i][$f]))) $str .= '\'  \', ';

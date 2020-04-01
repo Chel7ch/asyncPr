@@ -4,7 +4,7 @@ namespace DB;
 
 use PDO;
 
-class DBPdoCRUD
+class DBPdoExecute
 {
     public $sql;
 
@@ -29,11 +29,6 @@ class DBPdoCRUD
 
         return $results;
     }
-
-//    public function insertDB($sql = '')
-//    {
-//        $this->connect()->exec($sql);
-//    }
 
     public function selectDB($sql = '')
     {

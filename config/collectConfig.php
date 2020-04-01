@@ -25,4 +25,4 @@ echo '<pre>';
 //$clientHTTP = new Client\ProxyPHPWebDriver($url, 'chrome');
 //$filterLinks = new FilterLinks\ PaginatorCleanLinks();
 //$prepOutput = new Prepeare\ PrHidemyName();
-//$DB = new \DB\DBPdoCRUD(new\DB\MYSQLConnection);
+//$DB = new \DB\DBPdoExecute(new\DB\MYSQLConnection);
