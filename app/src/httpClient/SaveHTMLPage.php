@@ -2,18 +2,20 @@
 
 namespace Client;
 
+use Config\Config;
+
 trait SaveHTMLPage
 {
     public function saveHTMLPage($html, $name)
     {
-        if (SAVE_HTML_PAGE == 1) {
-            file_exists(PROJECT_DIR . '/htmlPages') ?: mkdir(PROJECT_DIR . '/htmlPages');
+        if (Config::get('saveHTMLPage') == 1) {
+            file_exists(Config::get('saveHTMLPages')) ?: mkdir(Config::get('saveHTMLPages'));
 
             $trans = array("https://" => "", "http://" => "", "/" => "~~");
             $name = strtr("$name", $trans);
 
             if (!empty($html)) {
-                $fd = fopen(PROJECT_DIR . '/htmlPages/' . $name . '.html', 'a');
+                $fd = fopen(Config::get('saveHTMLPages') . $name . '.html', 'a');
                 fputs($fd, $html);
                 fclose($fd);
             }

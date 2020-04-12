@@ -2,6 +2,7 @@
 
 namespace Parser;
 
+use Config\Config;
 use DiDom\Document;
 use DiDom\Query;
 use Proxy\CookingProxy;
@@ -67,15 +68,15 @@ class ParserGroupPage extends ParserRoutine
 
                 $data[] = $urls[$key];
                 foreach ($scratches as $scratch) {
-                    (USING_XPATH == 1) ? $data[] = $page->find($scratch, Query::TYPE_XPATH) : $data[] = $page->find($scratch);
+                    (Config::get('usingXPATH') == 1) ? $data[] = $page->find($scratch, Query::TYPE_XPATH) : $data[] = $page->find($scratch);
                 }
                 $data = $this->output->prepOutput($data);
                 $this->data = array_merge($this->data, $data);
                 unset($data);
             }
-            if (PREP_QUERY_FOR_DB == 1) {
+            if (Config::get('prepQueryForDB') == 1) {
                 $this->query = $this->output->prepInsert($this->data);
-                if (CONNECT_DB == 1) $this->insertDB($this->query);
+                if (Config::get('connectDB') == 1) $this->insertDB($this->query);
             }
         }
 
@@ -101,7 +102,7 @@ class ParserGroupPage extends ParserRoutine
 
     public function proxyOn()
     {
-        if (PROXY_ON == 1) {
+        if (Config::get('proxyOn') == 1) {
             $listProxy = $this->selectDB('SELECT  field1 FROM  check_proxy');
             if (self::$step == 0) CookingProxy::cook($listProxy, 1);
             else CookingProxy::cook($listProxy);
@@ -126,7 +127,7 @@ class ParserGroupPage extends ParserRoutine
 
     public function multiRequest()
     {
-        if (PROXY_ON == 1) self::$multiRequest = CookingProxy::$multiRequest;
+        if (Config::get('proxyOn') == 1) self::$multiRequest = CookingProxy::$multiRequest;
     }
 
 }

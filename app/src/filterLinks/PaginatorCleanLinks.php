@@ -2,6 +2,8 @@
 
 namespace FilterLinks;
 
+use Config\Config;
+
 class PaginatorCleanLinks implements ICleanLinks
 {
 
@@ -17,9 +19,9 @@ class PaginatorCleanLinks implements ICleanLinks
             }
 
             // если пагинатор то берем
-            if (stristr($urn, TAIL)) {
+            if (stristr($urn, Config::get('tail'))) {
                 // создаем  URN
-                $link[] = URL . $urn;
+                $link[] = Config::get('url') . $urn;
             }
         }
         if (!empty($link)) $link = array_values(array_unique($link));

@@ -2,11 +2,15 @@
 
 namespace FilterLinks;
 
+use Config\Config;
+
 class MainCleanLinks implements ICleanLinks
 {
     public function cleanLinks($links)
     {
         $link = array();
+        $strlenProject = strlen(Config::get('project'));
+
         foreach ($links as $urn) {
 
             $urn = urldecode(trim($urn));
@@ -23,9 +27,9 @@ class MainCleanLinks implements ICleanLinks
 
             // убираем ссылки на картинки и проч файлы
             if (stristr($urn, '.')) {
-                if (strpos($urn, PROJECT)) $t = str_replace(PROJECT, '', stristr($urn, PROJECT));
+                if (strpos($urn, Config::get('project'))) $t = str_replace(Config::get('project'), '', stristr($urn, Config::get('project')));
                 else $t = $urn;
-                if (stristr($t, '.') && !preg_match('#\.(php|html|htm|)?[\? \/]#' , $t)) continue;
+                if (stristr($t, '.') && !preg_match('#\.(php|html|htm|)?[\? \/]#', $t)) continue;
             }
 
             //убираем двойной слэш на конце
@@ -39,10 +43,10 @@ class MainCleanLinks implements ICleanLinks
 
             // добавляем протокол HTTP или HTTPS
             if (substr($urn, 0, 2) == '//') {
-                if (isset($_SERVER['HTTPS']) && substr($urn, 2, STRLEN_PROJECT) == PROJECT) {
+                if (isset($_SERVER['HTTPS']) && substr($urn, 2, $strlenProject) == Config::get('project')) {
                     $link[] = 'https:' . $urn;
                     continue;
-                } elseif (isset($_SERVER['REQUEST_SCHEME']) && substr($urn, 2, STRLEN_PROJECT) == PROJECT) {
+                } elseif (isset($_SERVER['REQUEST_SCHEME']) && substr($urn, 2, $strlenProject) == Config::get('project')) {
                     $link[] = 'http:' . $urn;
                     continue;
                 }// удаляем ссылки на сторонние сайты
@@ -58,14 +62,14 @@ class MainCleanLinks implements ICleanLinks
                 $t = strtr("$urn", $t);
                 // сохраняем абсолютную ссылку
                 // неполная проверка надо добавить проверку последнего/следующего символа PROJECT
-                if (substr($t, 0, STRLEN_PROJECT) == PROJECT) {
+                if (substr($t, 0, $strlenProject) == Config::get('project')) {
                     $link[] = $urn;
                     continue;
                 } // удаляем ссылки на сторонние сайты
-                elseif (!stristr($t, PROJECT))
+                elseif (!stristr($t, Config::get('project')))
                     continue;
                 //удаляем ссылки на  поддомены
-                elseif (stristr($t, PROJECT)) {
+                elseif (stristr($t, Config::get('project'))) {
                     //echo '!!!Внимание удаляется ссылка  '. $urn . '  Ты уветен???<br>';
                     continue;
                 }
@@ -76,7 +80,7 @@ class MainCleanLinks implements ICleanLinks
                 continue;
 
             // создаем  URI
-            $link[] = URL . $urn;
+            $link[] = Config::get('url') . $urn;
 
         }
         if (!empty($link)) $link = array_values(array_unique($link));

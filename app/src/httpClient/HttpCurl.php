@@ -2,6 +2,7 @@
 
 namespace Client;
 
+use Config\Config;
 use Proxy\CookingProxy;
 
 class HttpCurl implements IHttpClient
@@ -13,10 +14,10 @@ class HttpCurl implements IHttpClient
     private $page;
     public $scratch;
 
-    public function __construct($url, $header)
+    public function __construct()
     {
-        $this->url = $url;
-        $this->header = $header;
+        $this->url = Config::get('url');
+        $this->header = Config::get('header');
     }
 
     /**
@@ -30,8 +31,8 @@ class HttpCurl implements IHttpClient
         $mh = curl_multi_init();
 
         if (!empty(CookingProxy::$workProxy)) $proxy = CookingProxy::$workProxy;
-        print_r($proxy);
-        echo '__________$proxy';//!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+//        print_r($proxy);
+//        echo '__________$proxy';//!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
         if (is_array($proxy)) {
             foreach ($urls as $i => $url) {
@@ -69,7 +70,7 @@ class HttpCurl implements IHttpClient
 
     public function curlInfo($resp)
     {
-        if (CURL_HTTP_INFO == 1) {
+        if (Config::get('curlHTTPInfo') == 1) {
             echo '<br>' . $resp['http_code'] . ' ответ сервера';
             echo '<br>' . $resp['total_time'] . ' total_time';
             echo '<br>' . $resp['connect_time'] . ' Время затраченное на установку соединения<br>';
@@ -88,7 +89,7 @@ class HttpCurl implements IHttpClient
         $agent = null;
         $outputString = 1;
         $followlacation = 1;
-        $cookie = COOKIE_FILE . '/cookie.txt';
+        $cookie = Config::get('cookieFile') ;
 
         $curl = curl_init();
 
@@ -129,8 +130,8 @@ class HttpCurl implements IHttpClient
         curl_setopt($curl, CURLOPT_SSL_VERIFYHOST, 0);  // FALSE  не проверяем SSL удалённого сервера. 0-1-2
 
         curl_setopt($curl, CURLOPT_RETURNTRANSFER, $outputString); // 0 - вывод в браузер 1- возвращение строки
-        curl_setopt($curl, CURLOPT_TIMEOUT, CURL_TIMEOUT);  // Макс. позволенное колич. секунд для выполнения cURL-функций
-        curl_setopt($curl, CURLOPT_CONNECTTIMEOUT, CURL_CONNECTTIMEOUT);  // сек. таймаут соединения. 0 - бесконечное ожидание
+        curl_setopt($curl, CURLOPT_TIMEOUT, Config::get('respTimeout'));  // Макс. позволенное колич. секунд для выполнения cURL-функций
+        curl_setopt($curl, CURLOPT_CONNECTTIMEOUT, Config::get('connentTimeout'));  // сек. таймаут соединения. 0 - бесконечное ожидание
 
         return $curl;
 

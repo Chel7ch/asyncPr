@@ -2,15 +2,15 @@
 
 namespace DB;
 
+use Config\Config;
+
 class FileExecute
 {
-
     public function execInsert($data, $fName = PROJECT)
     {
-        file_exists(PROJECT_DIR . '/logs') ?: mkdir(PROJECT_DIR . '/logs');
+        file_exists(Config::get('logErrRespDir')) ?: mkdir(Config::get('logErrRespDir'));
 
-        $nameFile = PROJECT_DIR . '/logs/' . $fName . '.csv';
-        print_r($data);
+        $nameFile = Config::get('logErrRespDir') . '/' . $fName . '.csv';
         $fd = fopen($nameFile, 'a');
         foreach ($data as $d) {
             $d = str_replace('\'', '', $d);
@@ -19,12 +19,28 @@ class FileExecute
         fclose($fd);
     }
 
-    public function execSelect($sql)
+    public function execSelect($nameFile = PROJECT)
     {
+        $nameFile = Config::get('logErrRespDir') . '/' . $nameFile . '.csv';
+
+        $str = array();
+        if (file_exists($nameFile) && ($fp = fopen($nameFile, "r")) !== FALSE) {
+            while (!feof($fp)) {
+                $str[] = fgets($fp);
+            }
+            fclose($fp);
+
+            $str = str_replace(array("\r", "\n"), "", $str);
+            $str = array_diff($str, array('', 0, null));
+            $str = array_unique($str);
+        }
+
+        return $str;
     }
 
-    public function cleanTable($fName = PROJECT)
+    public function cleanFile($fName = PROJECT)
     {
-        file_put_contents(PROJECT_DIR . '/logs/' . $fName . '.csv', '');
+        file_put_contents(Config::get('logErrRespDir') . '/' . $fName . '.csv', '');
     }
+
 }

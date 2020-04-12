@@ -2,6 +2,7 @@
 
 namespace Parser;
 
+use Config\Config;
 use Proxy\CookingProxy;
 
 class SpiderGroup extends ParserGroupPage
@@ -19,12 +20,12 @@ class SpiderGroup extends ParserGroupPage
         self::$step++;
         $this->proxyOn();
 
-        for ($i = 1; $i <= LEVELS; $i++) {
+        for ($i = 1; $i <= Config::get('levels'); $i++) {
             list($links, $linked) = $this->parsOneLevel($links, $linked, $scratches);
-            if (PROXY_ON == 1) list($links, $linked) = $this->forceReadErrResponse($links, $linked, $scratches,ZERO_ERR_RESP_FILE);
+            if (Config::get('proxyOn') == 1) list($links, $linked) = $this->forceReadErrResponse($links, $linked, $scratches,Config::get('zeroErrRespFile'));
         }
 
-        list($links, $linked) = $this->forceReadErrResponse($links, $linked, $scratches, ERR_RESP_FILE);
+        list($links, $linked) = $this->forceReadErrResponse($links, $linked, $scratches, Config::get('errRespFile'));
 
         $this->writelogs($links, 'links');
         $this->writelogs($linked, 'linked');
@@ -70,7 +71,7 @@ class SpiderGroup extends ParserGroupPage
             $linked = array_merge($linked, $urls);
             $sub = array_unique(array_merge($sub, $subLinks));
             $sub = array_diff($sub, $links, $linked);
-            usleep(USLEEP);
+            usleep(Config::get('usleep'));
         }
 
         return array($sub, $linked);
@@ -79,7 +80,7 @@ class SpiderGroup extends ParserGroupPage
     public function forceReadErrResponse($links, $linked, $scratches,$fname)
     {
 
-        for ($i = 1; $i <= FORCE_READ_ERR_RESPONSE_URL; $i++) {
+        for ($i = 1; $i <= Config::get('forceReadErrResponseUrl'); $i++) {
             $errorURL = $this->readErrorURL($fname);
             if (empty($errorURL)){
                 return array($links, $linked);

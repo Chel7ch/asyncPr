@@ -64,7 +64,7 @@ class HttpGuzzle implements IHttpClient
         }
 
         $this->saveHTMLPage($content, $page);
-        if (HTTP_INFO == 1) HTTPInfo::Info($page, $content);
+        if (Config::get('curlHTTPInfo') == 1) HTTPInfo::Info($page, $content);
 
         return $content;
     }

@@ -2,6 +2,8 @@
 
 namespace Proxy;
 
+use Config\Config;
+
 class ReadCollectProxy extends \Parser\ReadSaveFiles
 {
     use FilterHidemyName;
@@ -37,7 +39,7 @@ class ReadCollectProxy extends \Parser\ReadSaveFiles
     public function prepOutput($data)
     {
         $data = $this->specialPrepOutput($data);
-        if (PREP_QUERY_FOR_DB == 1) $data = $this->prepInsertDB($data, 'collect_proxy');
+        if (Config::get('prepQueryForDB') == 1) $data = $this->prepInsertDB($data, 'collect_proxy');
 
         return $data;
     }
@@ -49,12 +51,12 @@ class ReadCollectProxy extends \Parser\ReadSaveFiles
             return $query;
         }
 
-        if($tabName == TAB_NAME) $firstRow = 'INSERT INTO ' . TAB_NAME . '(links,';
+        if($tabName == Config::get('tabName')) $firstRow = 'INSERT INTO ' . Config::get('tabName') . '(links,';
         else $firstRow = 'INSERT INTO ' . $tabName . '(';
 
         $tab = $firstRow;
         $val = ' VALUES';
-        for ($i = 1; $i < TAB_FIELDS; $i++) {
+        for ($i = 1; $i < Config::get('tabFields'); $i++) {
             $tab .= 'field' . ($i) . ',';
         }
 

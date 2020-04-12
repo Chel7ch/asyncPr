@@ -4,6 +4,7 @@ namespace Proxy;
 
 use Client\IHttpClient;
 use App\Service;
+use Config\Config;
 
 class ProxyGroupChecker
 {
@@ -29,7 +30,7 @@ class ProxyGroupChecker
      */
     public function getGroupPages($proxy = '')
     {
-        $urls = array_fill(0, MULTI_REQUEST, self::CHECKER);
+        $urls = array_fill(0, Config::get('multiRequest'), self::CHECKER);
         return $this->client->getGroupPages($urls, $proxy);
     }
 
@@ -93,13 +94,13 @@ class ProxyGroupChecker
         while ($goodProxy < COUNT_GOOD_PROXY or COUNT_GOOD_PROXY == -1) {
 
             while ($selProxy) {
-                $listProxy = array_splice($selProxy, 0, MULTI_REQUEST);
+                $listProxy = array_splice($selProxy, 0, Config::get('multiRequest'));
 
                 $good = (array)$this->diffIP($listProxy);
 
                 if (!empty($good)) $this->insertProxy($good);
 
-                $cycle = $cycle + MULTI_REQUEST;//!!!!!!!!!!!
+                $cycle = $cycle + Config::get('multiRequest');//!!!!!!!!!!!
                 $goodProxy = $goodProxy + count($good);//!!!!!!!!!!!
             }
 

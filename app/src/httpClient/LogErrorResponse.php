@@ -2,6 +2,7 @@
 
 namespace Client;
 
+use Config\Config;
 use Parser\SpiderGroup;
 use Proxy\CookingProxy;
 
@@ -19,18 +20,18 @@ trait LogErrorResponse
                     self::$zeroUrl[] = $url;
 
                     $errReq = array($url);
-                    $this->writeErrResp($errReq, ZERO_ERR_RESP_FILE);
+                    $this->writeErrResp($errReq, Config::get('zeroErrRespFile'));
                 }
             } elseif ($response != 0) {
                 $errReq = array($response, $url);
-                $this->writeErrResp($errReq, ERR_RESP_FILE);
+                $this->writeErrResp($errReq, Config::get('errRespFile'));
             }
         }
     }
 
     public function writeErrResp($errReq, $nameFile)
     {
-        file_exists(PROJECT_DIR . '/logs') ?: mkdir(PROJECT_DIR . '/logs');
+        file_exists(Config::get('logErrRespDir')) ?: mkdir(Config::get('logErrRespDir'));
         $fd = fopen($nameFile, 'a');
         fputcsv($fd, $errReq);
         fclose($fd);

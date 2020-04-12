@@ -2,6 +2,7 @@
 
 namespace DB;
 
+use Config\Config;
 use PDO;
 
 class DBPdoExecute
@@ -32,7 +33,7 @@ class DBPdoExecute
 
     public function selectDB($sql = '')
     {
-        $sql = 'SELECT * FROM ' . TAB_NAME;
+        $sql = 'SELECT * FROM ' . Config::get('tabName');
 
         $st = $this->connect()->query($sql);
         $results = $st->fetchAll();

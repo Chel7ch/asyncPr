@@ -2,6 +2,7 @@
 
 namespace Parser;
 
+use Config\Config;
 use Proxy\CookingProxy;
 
 class Spider extends ParserPage
@@ -18,15 +19,18 @@ class Spider extends ParserPage
         self::$step++;
         $this->proxyOn();
 
-        for ($i = 1; $i <= LEVELS; $i++) {
+        for ($i = 1; $i <= Config::get('levels'); $i++) {
             list($links, $linked) = $this->parsOneLevel($links, $linked, $scratches);
-            if (PROXY_ON == 1) list($links, $linked) = $this->forceReadErrResponse($links, $linked, $scratches,ZERO_ERR_RESP_FILE);
-       echo $i.'========================================LEVELS';//!!!!!!!!!!!!!!!!!!!
+            if (Config::get('proxyOn') == 1) list($links, $linked) = $this->forceReadErrResponse($links, $linked, $scratches,Config::get('zeroErrRespFile'));
+//       echo $i.'========================================LEVELS';//!!!!!!!!!!!!!!!!!!!
         }
-        list($links, $linked) = $this->forceReadErrResponse($links, $linked, $scratches, ERR_RESP_FILE);
+        list($links, $linked) = $this->forceReadErrResponse($links, $linked, $scratches, Config::get('errRespFile'));
 
-        $this->writelogs($links, 'links');
-        $this->writelogs($linked, 'linked');
+        if(Config::get('writeLogs') == 1){
+            $this->writelogs($links, 'links');
+            $this->writelogs($linked, 'linked');
+        }
+
 
         echo '<pre>';
         echo '<br>links<br>';
@@ -73,7 +77,7 @@ class Spider extends ParserPage
 
             $linked[] = $nextLink;
             array_shift($links);
-            usleep(USLEEP);
+            usleep(Config::get('usleep'));
 
 
             echo '________________________________parsOneLevel___________________<br>';
@@ -96,7 +100,7 @@ class Spider extends ParserPage
     {
         echo $fname. '________________________________forceReadErrResponse enter___________________<br>';//!!!
 
-        for ($i = 1; $i <= FORCE_READ_ERR_RESPONSE_URL; $i++) {
+        for ($i = 1; $i <= Config::get('forceReadErrResponseUrl'); $i++) {
             $errorURL = $this->readErrorURL($fname);
             if (empty($errorURL)){
                 echo '--------------!!!!!!!!!!!!!!!!!!!!!!!=-------------$errorURL<br>';//!!!!!!!

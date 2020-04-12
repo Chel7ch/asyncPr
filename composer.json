@@ -16,7 +16,8 @@
       "Parser\\": "app/src/parser/",
       "Prepare\\": "app/src/prepOutput/",
       "DB\\": "app/src/saveResult/",
-      "Proxy\\": "app/src/proxy/"
+      "Proxy\\": "app/src/proxy/",
+      "Config\\": "config/"
     }
   }
 }

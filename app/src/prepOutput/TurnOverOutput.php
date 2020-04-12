@@ -2,6 +2,8 @@
 
 namespace Prepare;
 
+use Config\Config;
+
 class TurnOverOutput  extends  PrepInsertQuery implements IPrepareOutput
 {
 
@@ -22,7 +24,7 @@ class TurnOverOutput  extends  PrepInsertQuery implements IPrepareOutput
         }
         /** prepare data   */
         for ($f = 0; $f < $maxCount; $f++) {
-            (OUTPUT_WITH_URL == 1)? $str = '\'' . $data[0] . '\', ': $str ='' ;
+            (Config::get('outputWithUrl') == 1)? $str = '\'' . $data[0] . '\', ': $str ='' ;
 
             for ($i = 1; $i < $numbArray; $i++) {
 

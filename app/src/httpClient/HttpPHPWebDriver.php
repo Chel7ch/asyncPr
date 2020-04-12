@@ -2,6 +2,7 @@
 
 namespace Client;
 
+use Config\Config;
 use Facebook\WebDriver\Exception\WebDriverException;
 use Facebook\WebDriver\Remote\DesiredCapabilities;
 use Facebook\WebDriver\Remote\RemoteWebDriver;
@@ -9,7 +10,7 @@ use Facebook\WebDriver\WebDriverBy;
 
 class HttpPHPWebDriver implements IHttpClient
 {
-    use ErrResp, SaveHTMLPage;
+    use LogErrorResponse, SaveHTMLPage;
     /**
      * @var RemoteWebDriver
      */
@@ -17,9 +18,10 @@ class HttpPHPWebDriver implements IHttpClient
     public $url;
     public $scratch;
 
-    public function __construct($url, $browserType)
+    public function __construct()
     {
-        $this->url = $url;
+        $this->url = Config::get('url');
+        $browserType = Config::get('browserType');
         # browser_type
         # :firefox => firefox
         # :chrome  => chrome
@@ -49,7 +51,7 @@ class HttpPHPWebDriver implements IHttpClient
             $this->driver->get($page);
 //            sleep(1);
 
-            $this->errResp(http_response_code(), $page);
+//            $this->errResp(http_response_code(), $page);
             $element = $this->driver->findElement(WebDriverBy::tagName('*'));
             $content = $element->getAttribute('outerHTML');
 

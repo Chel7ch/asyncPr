@@ -4,6 +4,8 @@
 namespace Prepare;
 
 
+use Config\Config;
+
 class PrHidemyName extends PrepInsertQuery implements IPrepareOutput
 {
     /**
@@ -55,7 +57,7 @@ class PrHidemyName extends PrepInsertQuery implements IPrepareOutput
 
         $tab = $firstRow = 'INSERT INTO ' . $tabName . '(';
 
-        for ($i = 1; $i < TAB_FIELDS; $i++) {
+        for ($i = 1; $i < Config::get('tabFields'); $i++) {
             $tab .= 'field' . ($i) . ',';
         }
         $val = ' VALUES';

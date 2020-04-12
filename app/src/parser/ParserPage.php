@@ -2,13 +2,14 @@
 
 namespace Parser;
 
+use Config\Config;
 use DiDom\Document;
 use DiDom\Query;
 use Proxy\CookingProxy;
 
 class ParserPage extends ParserRoutine
 {
-
+    use WriteLogs;
     /**
      * @var array scratch  XML expressions for searching on a page. Needs of benefits
      * @var object client HTTP client
@@ -19,6 +20,7 @@ class ParserPage extends ParserRoutine
     public $client;
     public $connect;
     public $doc;
+    public $paternLinks;
     public $links = array();
     public static $workProxy;
     public static $step = 0;
@@ -26,6 +28,7 @@ class ParserPage extends ParserRoutine
     public function __construct()
     {
         $this->doc = new Document();
+        $this->paternLinks = '//a/@href';
     }
 
     /**
@@ -51,41 +54,45 @@ class ParserPage extends ParserRoutine
         return $page;
     }
 
+    public function setPaternLinks($links = '//a/@href')
+    {
+        $this->paternLinks = $links;
+    }
+
     /**
      * pulls links from page
+     * @param $url
+     * @param array $scratches
      * @return array
-     * @uses CleanLinks trait
      */
-    public function parsLinks($url, $scratches = [])
+    private function parsLinks($url, $scratches = [])
     {
         $page = $this->parsPage($url);
 
         if (!empty($page)) {
-            $this->links = $page->find('a::attr(href)');
+            $this->links = $page->find($this->paternLinks, Query::TYPE_XPATH);
 
             $this->links = $this->filter->cleanLinks($this->links);
 
             $data[] = $url;
             foreach ($scratches as $scratch) {
-                (USING_XPATH == 1) ? $data[] = $page->find($scratch, Query::TYPE_XPATH) : $data[] = $page->find($scratch);
+                (Config::get('usingXPATH') == 1) ? $data[] = $page->find($scratch, Query::TYPE_XPATH) : $data[] = $page->find($scratch);
             }
-
             $this->data = $this->output->prepOutput($data);
 
-            if (PREP_QUERY_FOR_DB == 1) {
+            if (empty($this->query)) return $this->links;
 
-                $this->query = $this->output->prepInsert($this->data);
-
-                if (empty($this->query)) return $this->links;
-                if (CONNECT_DB == 1) $this->insertDB($this->query);
-            }
+            $this->query = $this->output->prepInsert($this->data);
+            if (Config::get('connectDB') == 1) $this->insertDB($this->query);
         }
         return $this->links;
     }
 
     public function getLinks($url, $scratches)
     {
-        return $this->parsLinks($url, $scratches);
+        $links = $this->parsLinks($url, $scratches);
+        if(Config::get('writeLogs') == 1)$this->writelogs($links, 'links');
+        return $links;
     }
 
     public function getBenefit($url, $scratches)
@@ -103,14 +110,14 @@ class ParserPage extends ParserRoutine
     public function proxyOn()
     {
         static $i = 0;
-        if (PROXY_ON == 1) {
+        if (Config::get('proxyOn') == 1) {
             $listProxy = $this->selectDB('SELECT  field1 FROM  check_proxy');
             if ($i == 0) {
                 CookingProxy::cook($listProxy, 1);
                 self::$workProxy = CookingProxy::$workProxy;
                 CookingProxy::$firstPage = self::$step;
                 $i++;
-            }else{
+            } else {
                 CookingProxy::$listP = $listProxy;
                 CookingProxy::$firstPage = self::$step;
                 CookingProxy::$attemptWork = 0;

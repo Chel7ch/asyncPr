@@ -2,6 +2,8 @@
 
 namespace Prepare;
 
+use Config\Config;
+
 abstract class PrepInsertQuery
 {
 //    public static $tabName = TAB_NAME ;
@@ -14,12 +16,12 @@ abstract class PrepInsertQuery
             return $query;
         }
 
-        if($tabName == TAB_NAME and OUTPUT_WITH_URL == 1) $firstRow = 'INSERT INTO ' . TAB_NAME . '(links,';
+        if($tabName == Config::get('tabName') and Config::get('outputWithUrl') == 1) $firstRow = 'INSERT INTO ' . Config::get('tabName') . '(links,';
         else $firstRow = 'INSERT INTO ' . $tabName . '(';
 
         $tab = $firstRow;
 
-        for ($i = 0; $i < TAB_FIELDS; $i++) {
+        for ($i = 0; $i < Config::get('tabFields'); $i++) {
             $tab .= 'field' . ($i+1) . ',';
         }
         $val = ' VALUES';

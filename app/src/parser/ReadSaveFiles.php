@@ -2,6 +2,7 @@
 
 namespace Parser;
 
+use Config\Config;
 use DiDom\Document;
 use DiDom\Query;
 
@@ -27,27 +28,15 @@ class ReadSaveFiles extends ParserRoutine
     /**
      * Crawling files from  storage/progects/../htmlPages
      * @param $scratch
+     * @param string $patern
      * @return void
      */
-    public function rollFiles($scratch)
+    public function rollFiles($scratch, $patern = '\w+')
     {
-        $dir = PROJECT_DIR . '/htmlPages';
-        if (file_exists($dir)) {
-            $files = scandir($dir);
+        $files = $this->getLinks($patern);
 
-            $files = array_values(array_unique(array_diff($files, array('.', '..', null))));
-
-            foreach ($files as $fname) {
-
-                $doc = $dir . '/' . $fname;
-                if (strpos($doc, '.html', -5)) {
-                    $trans = array(".html" => "", "~~" => "/");
-                    $url = strtr($fname, $trans);
-
-                    $page = $this->getFile($doc);
-                    $this->parsFile($page, $url, $scratch);
-                }
-            }
+        foreach ($files as $fname) {
+            $this->getBenefit($fname, $scratch);
         }
     }
 
@@ -61,33 +50,52 @@ class ReadSaveFiles extends ParserRoutine
     {
         $data[] = $url;
         foreach ($scratches as $scratch) {
-            (USING_XPATH == 1) ? $dt = $page->find($scratch, Query::TYPE_XPATH) : $dt = $page->find($scratch);
+            (Config::get('usingXPATH') == 1) ? $dt = $page->find($scratch, Query::TYPE_XPATH) : $dt = $page->find($scratch);
             $data[] = $this->filter->cleanLinks($dt);
-         }
+        }
 
         $this->data = $this->output->prepOutput($data);
 
-        if (CONNECT_DB == 1) {
-            if (empty($this->data)) return;
-            $this->query = $this->output->prepInsert($this->data);
+        if (empty($this->data)) return;
+
+        $this->query = $this->output->prepInsert($this->data);
+        if (Config::get('connectDB') == 1) {
             $this->insertDB($this->query);
-        }else (new \DB\FileExecute)->execInsert($this->data);
+        } else (new \DB\FileExecute)->execInsert($this->data);
+    }
+
+    public function getLinks($patern = '\w+')
+    {
+        $match = array();
+        $dir = Config::get('saveHTMLPages');
+
+        if (file_exists($dir)) $files = scandir($dir);
+
+        foreach ($files as $file) {
+            if (preg_match("#$patern#", $file) and strpos($file, '.html', -5)) {
+                $match[] = $file;
+            }
+        }
+
+        return $match;
     }
 
     public function getBenefit($fname, $scratches)
     {
-        $doc = PROJECT_DIR . '/htmlPages/' . $fname;
+        $doc = Config::get('saveHTMLPages') . '/' . $fname;
         $trans = array(".html" => "", "~~" => "/");
         $url = strtr($fname, $trans);
 
         $page = $this->getFile($doc);
         $this->parsFile($page, $url, $scratches);
+
         return $this->data;
     }
 
     public function getQuery($fname, $scratches)
     {
         $this->getBenefit($fname, $scratches);
+
         return $this->query;
     }
 

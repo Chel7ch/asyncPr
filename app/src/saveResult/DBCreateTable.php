@@ -3,6 +3,8 @@
 namespace DB;
 
 
+use Config\Config;
+
 class DBCreateTable
 {
 
@@ -20,10 +22,10 @@ class DBCreateTable
     public function createTable()
     {
 
-        $tb = 'CREATE TABLE IF NOT EXISTS ' . TAB_NAME .'(';
+        $tb = 'CREATE TABLE IF NOT EXISTS ' . Config::get('tabName') .'(';
         $tb .= ' id int(6)  AUTO_INCREMENT PRIMARY KEY,';
         $tb .= ' links TEXT,';
-        for ($i = 1; $i <= TAB_FIELDS; $i++)
+        for ($i = 1; $i <= Config::get('tabFields'); $i++)
             $tb .= ' field' . $i . ' TEXT,';
         $tb = substr($tb, 0, -1) . ')';
         $tb .= 'ENGINE=InnoDB DEFAULT CHARSET=utf8';

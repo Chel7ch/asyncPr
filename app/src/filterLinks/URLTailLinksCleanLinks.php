@@ -2,7 +2,9 @@
 
 namespace FilterLinks;
 
-class URLTailCleanLinks implements ICleanLinks
+use Config\Config;
+
+class URLTailLinksCleanLinks implements ICleanLinks
 {
 
     public function cleanLinks($links)
@@ -10,8 +12,8 @@ class URLTailCleanLinks implements ICleanLinks
         $link = array();
         foreach ($links as $urn) {
             $urn = urldecode(trim($urn));
-
-            $link[] = URL . TAIL . $urn;
+            
+            $link[] = Config::get('url') . Config::get('tail') . $urn;
         }
         if (!empty($link)) $link = array_values(array_unique($link));
 

@@ -1,67 +1,56 @@
 <?php
-# file main.php should be in the folder app
 
-$project =parse_url($url,1);
-$tabName = str_replace ('.', '_', $project);
-$t = parse_url($url,0).'://' . parse_url($url,1);
+$project = parse_url($url, 1);
 
-/** URL */
-define('URL', $t);
-@define('TAIL', $tail);
-/** Folders */
-define('PROJECT', $project);
-define('STRLEN_PROJECT', strlen($project));
-define('TAB_FIELDS', count($scratch)); // count column in table DB
-define('DIR_SCRIPT', $_SERVER['DOCUMENT_ROOT'] . '/async');
-define('PROJECT_DIR', DIR_SCRIPT.'/storage/projects/'.PROJECT);
-define('COOKIE_FILE', DIR_SCRIPT. '/storage/cookies');
-define('LOG_FILE', DIR_SCRIPT. '/storage/logs/php_errors.log');
-define('ERR_RESP_FILE', PROJECT_DIR . '/logs/err_response.csv');
-define('ZERO_ERR_RESP_FILE', PROJECT_DIR . '/logs/zero_err_response.csv');
-/** Setting */
-@define('MULTI_REQUEST', 3); // number of concurrent requests
-define('USLEEP', 0.2 *100000); // milliseconds waiting for script
-define('FORCE_READ_ERR_RESPONSE_URL', 3); // the number of retry to reading pages with a error response from the server
-@define('LEVELS', 1); // number of Spider pass levels
-@define('SAVE_HTML_PAGE', 1);// 1 - save in storage html page
-define('HTTP_INFO', 1);// 1 - turn on HTTP info
-/** benefit */
-@define('USING_XPATH', 1); // 1 - search using XPATH expressions 0 - search using DiDom expressions
-@define('OUTPUT_WITH_URL', '0'); // 1 - turn on add a column with url to output
-/** prepare  output */
-define('PREPARE_BENEFIT', 1); // 1 - true turnOverOutput 0 - true straightOutput
-define('PREP_QUERY_FOR_DB', 1); // 1 - for write in DB , 0 for write in file
-/** DB */
-@define('CONNECT_DB', '0'); // 1 - turn on writing in DB
 define('DB_NAME', 'parser');
-define('TAB_NAME', $tabName);
-/** HTTP*/
-@define('CURL_HTTP_INFO', '0'); // 1 - turn on Curl HTTP_InFo
-@define('PROXY_ON', '0'); // 1 - turn on proxy
-@define('CURL_TIMEOUT', '5');// number of seconds timeout
-@define('CURL_CONNECTTIMEOUT', '4');//number of seconds connect timeout
+define('SCRIPT_DIR', $_SERVER['DOCUMENT_ROOT'] . '/async');
+define('PROJECT_DIR', SCRIPT_DIR . '/storage/projects/' . $project);
+define('PROJECT', $project);
+//todo убрать константы
+define('TAB_NAME', str_replace('.', '_', $project));
+@define('MULTI_REQUEST', 5); // number of concurrent requests
 
-file_exists(DIR_SCRIPT. '/storage')? :mkdir(DIR_SCRIPT.'/storage');
-file_exists(DIR_SCRIPT. '/storage/logs')? :mkdir(DIR_SCRIPT. '/storage/logs');
-file_exists(DIR_SCRIPT.'/storage/projects')? :mkdir(DIR_SCRIPT.'/storage/projects');
-file_exists(COOKIE_FILE)? :mkdir(COOKIE_FILE);
-file_exists(PROJECT_DIR)? :mkdir(PROJECT_DIR);
-
-/** main settings */
-ini_set("memory_limit", "1000M");
-ini_set('max_execution_time',0);
-/** Output errors */
-ini_set('error_reporting', E_ALL);
-ini_set('display_errors', 1);
-ini_set('display_startup_errors', 1);
-/** Saving errors */
-ini_set('log_errors', 'On');
-ini_set('error_log', LOG_FILE );
-
-
-//if(!file_exists(PROJECT_DIR.'\screenshots')) mkdir(PROJECT_DIR.'\screenshots');
-//if(!file_exists(PROJECT_DIR.'\benefit')) mkdir(PROJECT_DIR.'\benefit');
-//if(!file_exists(PROJECT_DIR.'\images')) mkdir(PROJECT_DIR.'\images');
-//define('DIR_IMAGES', PROJECT_DIR .'\images\\');
-
-
+return [
+    'project' => PROJECT,
+    /** URL */
+    'url' => parse_url($url, 0) . '://' . parse_url($url, 1),
+    'header' => $header,
+    /** Folders */
+    'scriptDir' => SCRIPT_DIR,
+    'logsDir' => SCRIPT_DIR . '/storage/logs',
+    'cookieDir' => SCRIPT_DIR . '/storage/cookies',
+    'projectDir' => PROJECT_DIR,
+    'saveHTMLPages' => PROJECT_DIR . '/htmlPages',
+    'logErrRespDir' => PROJECT_DIR . '/logs',
+    /** Files */
+    'logFile' => SCRIPT_DIR . '/storage/logs/php_errors.log',
+    'cookieFile' => SCRIPT_DIR . '/storage/logs/cookie.txt',
+    'errRespFile' => SCRIPT_DIR . '/storage/projects/' . $project . '/logs/err_response.csv',
+    'zeroErrRespFile' => SCRIPT_DIR . '/storage/projects/' . $project . '/logs/zero_err_response.csv',
+    /** DB */
+    'connectDB' => '0',// 1 - turn on writing in DB
+    'tabName' => TAB_NAME,
+    'tabFields' => count($scratch),// count column in table "project tabName" in DB
+    /** Setting */
+    'usleep' => 38 * 100000,// milliseconds waiting for script
+    'levels' => 1,// number of Spider pass levels
+    'multiRequest' => 3,// number of parallel requests
+    'forceReadErrResponseUrl' => 3,// the number of retry to reading pages with a error response from the server
+    'saveHTMLPage' => 1,// 1 - save in storage html page
+    'HTTPInfo' => 1,// 1 - turn on HTTP info
+    /** Clean links */
+    'tail' => $tail,
+    /** benefit */
+    'usingXPATH' => 1,// 1 - search using XPATH expressions 0 - search using DiDom expressions
+    'outputWithUrl' => 0,// 1 - turn on add a column with url to output
+    /** prepare  output */
+    'writeLogs' => 1,// 1 - true
+    'prepBenefit' => 1,// 1 - true turnOverOutput 0 - true straightOutput
+    'prepQueryForDB' => 0,// 1 - for write in DB , 0 for write in file
+    /** HTTP*/
+    'proxyOn' => 0, // 1 - turn on proxy
+    'curlHTTPInfo' => 0,// 1 - turn on Curl HTTP_InFo
+    'respTimeout' => 5,// number of seconds timeout
+    'connentTimeout' => 4,//number of seconds connect timeout
+    'browserType' => 'chrome',//type browser for webDriver
+];
