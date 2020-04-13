@@ -7,9 +7,9 @@ use DiDom\Document;
 use DiDom\Query;
 
 /**
- * Class ReadSaveFiles crawling files from storage/progects/../htmlPages
+ * Class ReadSavedFiles crawling files from storage/progects/../htmlPages
  */
-class ReadSaveFiles extends ParserRoutine
+class ReadSavedFiles extends ParserRoutine
 {
     public function __construct()
     {
@@ -67,7 +67,7 @@ class ReadSaveFiles extends ParserRoutine
     public function getLinks($patern = '\w+')
     {
         $match = array();
-        $dir = Config::get('saveHTMLPages');
+        $dir = Config::get('saveHTMLDir');
 
         if (file_exists($dir)) $files = scandir($dir);
 
@@ -82,7 +82,7 @@ class ReadSaveFiles extends ParserRoutine
 
     public function getBenefit($fname, $scratches)
     {
-        $doc = Config::get('saveHTMLPages') . '/' . $fname;
+        $doc = Config::get('saveHTMLDir') . '/' . $fname;
         $trans = array(".html" => "", "~~" => "/");
         $url = strtr($fname, $trans);
 

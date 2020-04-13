@@ -20,7 +20,7 @@ return [
     'logsDir' => SCRIPT_DIR . '/storage/logs',
     'cookieDir' => SCRIPT_DIR . '/storage/cookies',
     'projectDir' => PROJECT_DIR,
-    'saveHTMLPages' => PROJECT_DIR . '/htmlPages',
+    'saveHTMLDir' => PROJECT_DIR . '/htmlPages',
     'logErrRespDir' => PROJECT_DIR . '/logs',
     /** Files */
     'logFile' => SCRIPT_DIR . '/storage/logs/php_errors.log',
@@ -32,7 +32,7 @@ return [
     'tabName' => TAB_NAME,
     'tabFields' => count($scratch),// count column in table "project tabName" in DB
     /** Setting */
-    'usleep' => 38 * 100000,// milliseconds waiting for script
+    'usleep' => 0.2 * 1000000,// mikroseconds waiting for script
     'levels' => 1,// number of Spider pass levels
     'multiRequest' => 3,// number of parallel requests
     'forceReadErrResponseUrl' => 3,// the number of retry to reading pages with a error response from the server
@@ -43,12 +43,15 @@ return [
     /** benefit */
     'usingXPATH' => 1,// 1 - search using XPATH expressions 0 - search using DiDom expressions
     'outputWithUrl' => 0,// 1 - turn on add a column with url to output
+    'scratch' => $scratch,
     /** prepare  output */
-    'writeLogs' => 1,// 1 - true
     'prepBenefit' => 1,// 1 - true turnOverOutput 0 - true straightOutput
     'prepQueryForDB' => 0,// 1 - for write in DB , 0 for write in file
+    'writeLogs' => 1,// 1 - true for spider and spiderGroup,  -1 - true for parserPage
+    'writeBenefitInFile' => 0,// 1 - record benefits in file
     /** HTTP*/
     'proxyOn' => 0, // 1 - turn on proxy
+    'countGoodProxy' => 1000,  // the number of proxies at which the check will end; -1 without limits
     'curlHTTPInfo' => 0,// 1 - turn on Curl HTTP_InFo
     'respTimeout' => 5,// number of seconds timeout
     'connentTimeout' => 4,//number of seconds connect timeout

@@ -3,6 +3,7 @@
 namespace Proxy;
 
 use Client\IHttpClient;
+use Config\Config;
 
 class ProxyChecker
 {
@@ -79,7 +80,7 @@ class ProxyChecker
         $countProxy = $this->selectCount();
         $selProxy = $this->selectProxy($rowId);
 
-        while (self::$goodProxy < COUNT_GOOD_PROXY or COUNT_GOOD_PROXY == -1) {
+        while (self::$goodProxy < Config::get('countGoodProxy') or Config::get('countGoodProxy') == -1) {
 
             foreach ($selProxy as $proxy) {
                 $this->diffIP($proxy);

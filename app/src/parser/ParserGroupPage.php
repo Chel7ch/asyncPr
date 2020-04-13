@@ -9,6 +9,8 @@ use Proxy\CookingProxy;
 
 class ParserGroupPage extends ParserRoutine
 {
+    use WriteLogs;
+
     /**
      * @var array scratch  XML expressions for searching on a page. Needs of benefits
      * @var object client HTTP client
@@ -74,10 +76,10 @@ class ParserGroupPage extends ParserRoutine
                 $this->data = array_merge($this->data, $data);
                 unset($data);
             }
-            if (Config::get('prepQueryForDB') == 1) {
-                $this->query = $this->output->prepInsert($this->data);
-                if (Config::get('connectDB') == 1) $this->insertDB($this->query);
-            }
+            $this->query = $this->output->prepInsert($this->data);
+
+            if (!empty($this->data) and Config::get('connectDB') == 1) $this->insertDB($this->query);
+            if (!empty($this->data) and Config::get('writeBenefitInFile') == 1) $this->writeBenefit($this->data);
         }
 
         return $this->links;

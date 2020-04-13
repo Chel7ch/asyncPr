@@ -37,4 +37,17 @@ trait WriteLogs
             return $arr;
         }
     }
+
+    public function writeBenefit($data, $nameFile = 'benefit')
+    {
+        $nameFile = Config::get('logErrRespDir') . '/' . $nameFile . '.csv';
+
+        file_exists(Config::get('logErrRespDir')) ?: mkdir(Config::get('logErrRespDir'));
+        $fd = fopen($nameFile, 'a');
+        foreach ($data as $d) {
+            $d = str_replace('\',', '\';', $d);
+            fputs($fd, $d . PHP_EOL);
+        }
+        fclose($fd);
+    }
 }

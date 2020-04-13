@@ -10,7 +10,6 @@ abstract class ParserRoutine
     public function setHttpClient(\Client\IHttpClient $client)
     {
         $this->client = $client;
-        $this->url = $this->client->url;
     }
 
     /**

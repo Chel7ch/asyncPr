@@ -2,6 +2,7 @@
 
 namespace Client;
 
+use Config\Config;
 use GuzzleHttp\Client;
 use GuzzleHttp\Exception\RequestException;
 use GuzzleHttp\Pool;
@@ -18,26 +19,17 @@ class HttpGuzzle implements IHttpClient
     /**plug-in traits */
     use ErrResp, SaveHTMLPage;
 
-    /** @var string URL
-     * @var array header of request
-     * @var object client of Guzzle
-     */
-    public $url;
-    public $header;
+    /** @var object client of Guzzle  */
     private $client;
 
-    /** Create a new object of client Guzzle
-     * @param string $url
-     * @param array $header
-     */
-    public function __construct($url, $header)
+    /** Create a new object of client Guzzle */
+    public function __construct()
     {
-        $this->url = $url;
         $this->client = new Client([
             'verify' => false,
-            'timeout' => 120.0,
+            'timeout' => 5.0,
             'cookies' => true,
-            'headers' => $header
+            'headers' => Config::get('header')
         ]);
     }
 

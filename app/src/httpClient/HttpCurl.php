@@ -9,17 +9,6 @@ class HttpCurl implements IHttpClient
 {
     use LogErrorResponse, SaveHTMLPage;
 
-    public $url;
-    private $header;
-    private $page;
-    public $scratch;
-
-    public function __construct()
-    {
-        $this->url = Config::get('url');
-        $this->header = Config::get('header');
-    }
-
     /**
      * @param array $urls
      * @param mixed $proxy
@@ -105,7 +94,7 @@ class HttpCurl implements IHttpClient
 //        curl_setopt($curl, CURLOPT_FILETIME, 1); // для  curl_info() попытка получения даты модификации удаленного документа
 
         // HTTPHEADER приорететнее USERAGENT , REFERER , ENCODING  и прочих. Формат  array('Content-type: text/plain', 'Content-length: 100')
-        curl_setopt($curl, CURLOPT_HTTPHEADER, $this->header);
+        curl_setopt($curl, CURLOPT_HTTPHEADER, Config::get('header'));
 //         curl_setopt($curl, CURLOPT_HTTPHEADER,['X-Requested-With: XMLHttpRequest', 'Accept-Language: ru-RU,ru;q=0.8,en-US;q=0.5,en;q=0.3']);
 //        curl_setopt($curl, CURLOPT_USERAGENT, $agent); // HTTPHEADER приорететнее USERAGENT
         curl_setopt($curl, CURLOPT_ENCODING, 'utf-8'); // Содержимое заголовка "Accept-Encoding:

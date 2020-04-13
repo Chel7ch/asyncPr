@@ -4,7 +4,7 @@ namespace Prepare;
 
 use Config\Config;
 
-class TurnOverOutput  extends  PrepInsertQuery implements IPrepareOutput
+class TurnOverOutput extends PrepInsertQuery implements IPrepareOutput
 {
 
     public function prepOutput($data)
@@ -15,8 +15,8 @@ class TurnOverOutput  extends  PrepInsertQuery implements IPrepareOutput
          */
         $maxCount = 0;
         $numbArray = 0;
-        $str ='';
         $dt = array();
+
         foreach ($data as $a) {
             $numbArray++;
             $c = count((array)$a);
@@ -24,7 +24,7 @@ class TurnOverOutput  extends  PrepInsertQuery implements IPrepareOutput
         }
         /** prepare data   */
         for ($f = 0; $f < $maxCount; $f++) {
-            (Config::get('outputWithUrl') == 1)? $str = '\'' . $data[0] . '\', ': $str ='' ;
+            (Config::get('outputWithUrl') == 1) ? $str = '\'' . $data[0] . '\', ' : $str = '';
 
             for ($i = 1; $i < $numbArray; $i++) {
 
@@ -38,7 +38,7 @@ class TurnOverOutput  extends  PrepInsertQuery implements IPrepareOutput
                     $str .= '\'' . $a . '\', ';
                 }
             }
-            $dt[] = substr($str, 0, -2);
+            if ($str and $str != ('\'' . $data[0] . '\', ')) $dt[] = substr($str, 0, -2);
         }
 
         return $dt;

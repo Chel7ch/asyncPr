@@ -3,7 +3,6 @@
 namespace Proxy;
 
 use Client\IHttpClient;
-use App\Service;
 use Config\Config;
 
 class ProxyGroupChecker
@@ -91,7 +90,7 @@ class ProxyGroupChecker
         $countProxy = $this->selectCount();
         $selProxy = $this->selectProxy($rowId);
 
-        while ($goodProxy < COUNT_GOOD_PROXY or COUNT_GOOD_PROXY == -1) {
+        while ($goodProxy < Config::get('countGoodProxy') or Config::get('countGoodProxy') == -1) {
 
             while ($selProxy) {
                 $listProxy = array_splice($selProxy, 0, Config::get('multiRequest'));

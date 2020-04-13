@@ -10,6 +10,7 @@ use Proxy\CookingProxy;
 class ParserPage extends ParserRoutine
 {
     use WriteLogs;
+
     /**
      * @var array scratch  XML expressions for searching on a page. Needs of benefits
      * @var object client HTTP client
@@ -79,11 +80,10 @@ class ParserPage extends ParserRoutine
                 (Config::get('usingXPATH') == 1) ? $data[] = $page->find($scratch, Query::TYPE_XPATH) : $data[] = $page->find($scratch);
             }
             $this->data = $this->output->prepOutput($data);
-
-            if (empty($this->query)) return $this->links;
-
             $this->query = $this->output->prepInsert($this->data);
-            if (Config::get('connectDB') == 1) $this->insertDB($this->query);
+
+            if (!empty($this->data) and Config::get('connectDB') == 1) $this->insertDB($this->query);
+            if (!empty($this->data) and Config::get('writeBenefitInFile') == 1) $this->writeBenefit($this->data);
         }
         return $this->links;
     }
@@ -91,7 +91,7 @@ class ParserPage extends ParserRoutine
     public function getLinks($url, $scratches)
     {
         $links = $this->parsLinks($url, $scratches);
-        if(Config::get('writeLogs') == 1)$this->writelogs($links, 'links');
+        if(Config::get('writeLogs') == -1)$this->writelogs($links, 'links');
         return $links;
     }
 

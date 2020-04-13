@@ -3,8 +3,6 @@
 namespace Client;
 
 use Facebook\WebDriver\Exception\WebDriverException;
-use Facebook\WebDriver\Remote\DesiredCapabilities;
-use Facebook\WebDriver\Remote\RemoteWebDriver;
 use Facebook\WebDriver\WebDriverBy;
 
 class ProxyPHPWebDriver extends HttpPHPWebDriver implements IHttpClient
@@ -18,15 +16,14 @@ class ProxyPHPWebDriver extends HttpPHPWebDriver implements IHttpClient
 
             if ($d < 3 ) {
                 $this->driver->get($page);
-                sleep(10); //!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+                sleep(10);
                 $d++;
 
             } else{
                 $this->driver->get($page);
-                sleep(rand(3, 7)); //!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+                sleep(rand(3, 7));
             }
 
-            $this->errResp(http_response_code(), $page);
             $element = $this->driver->findElement(WebDriverBy::tagName('*'));
             $content = $element->getAttribute('outerHTML');
 

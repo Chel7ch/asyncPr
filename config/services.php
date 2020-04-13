@@ -5,7 +5,7 @@ return array(
             'curl' => 'Client\HttpCurl',
             'guzzle' => 'Client\HttpGuzzle',
             'webDriver' => 'Client\HttpPHPWebDriver',
-            'proxyWebDriver' => 'Client\HttpPHPWebDriver',
+            'proxyWebDriver' => 'Client\ProxyPHPWebDriver',
         ),
     'filterlinks' =>
         array(

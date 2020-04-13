@@ -20,7 +20,6 @@ class HttpPHPWebDriver implements IHttpClient
 
     public function __construct()
     {
-        $this->url = Config::get('url');
         $browserType = Config::get('browserType');
         # browser_type
         # :firefox => firefox
