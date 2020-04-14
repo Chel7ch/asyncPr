@@ -15,7 +15,7 @@ class CookingProxy
     static public $multiRequest;
     static public $firstPage;
 
-    public static function cook($listProxy, $count = MULTI_REQUEST)
+    public static function cook($listProxy, $count)
     {
         self::$attemptWork = 0;
         self::$badProxy = array();

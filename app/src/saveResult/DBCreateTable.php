@@ -22,7 +22,7 @@ class DBCreateTable
     public function createTable()
     {
 
-        $tb = 'CREATE TABLE IF NOT EXISTS ' . Config::get('tabName') .'(';
+        $tb = 'CREATE TABLE IF NOT EXISTS ' . TAB_NAME .'(';
         $tb .= ' id int(6)  AUTO_INCREMENT PRIMARY KEY,';
         $tb .= ' links TEXT,';
         for ($i = 1; $i <= Config::get('tabFields'); $i++)

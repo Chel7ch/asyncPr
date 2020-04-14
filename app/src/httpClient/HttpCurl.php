@@ -3,6 +3,7 @@
 namespace Client;
 
 use Config\Config;
+use Exception;
 use Proxy\CookingProxy;
 
 class HttpCurl implements IHttpClient
@@ -45,7 +46,7 @@ class HttpCurl implements IHttpClient
             curl_multi_remove_handle($mh, $conn[$i]);
 
             $resp = curl_getinfo($conn[$i]);
-            $this->curlInfo($resp);
+            $this->curlInfo($resp,$url, $conn[$i]);
             @$this->errorResponse($resp['http_code'], $urls[$i], $proxy[$i]);
 
             curl_close($conn[$i]);
@@ -57,13 +58,13 @@ class HttpCurl implements IHttpClient
 
     }
 
-    public function curlInfo($resp)
+    public function curlInfo($resp, $url, $curl)
     {
-        if (Config::get('curlHTTPInfo') == 1) {
+        if (Config::get('curlHTTPInfo') >= 1) {
             echo '<br>' . $resp['http_code'] . ' ответ сервера';
             echo '<br>' . $resp['total_time'] . ' total_time';
-            echo '<br>' . $resp['connect_time'] . ' Время затраченное на установку соединения<br>';
-//          HTTPInfo::Info($page, $curl);
+            echo '<br>' . $resp['connect_time'] . ' Время затраченное на установку соединения';
+            if (Config::get('curlHTTPInfo') == 2) HTTPInfo::Info($url, $curl);
         }
     }
 
@@ -74,45 +75,33 @@ class HttpCurl implements IHttpClient
      */
     public function setoptCurl($page, $proxy = '')
     {
-        $postData = '';
-        $agent = null;
         $outputString = 1;
         $followlacation = 1;
-        $cookie = Config::get('cookieFile') ;
 
         $curl = curl_init();
 
         curl_setopt($curl, CURLOPT_URL, $page);
-//        if ($postData != '') {
-//            curl_setopt($curl, CURLOPT_POST, !is_null($postData)); // TRUE для HTTP POST
-//            if ($postData) curl_setopt($curl, CURLOPT_POSTFIELDS, $postData); // сами POST переменые
+//        if (Config::get('postData')) {
+//            curl_setopt($curl, CURLOPT_POST, 1); // TRUE для HTTP POST
+//            curl_setopt($curl, CURLOPT_POSTFIELDS, Config::get('postData')); // сами POST переменые
 //        }
 //        curl_setopt($curl, CURLOPT_HEADER, 1);  // FALSE отключение заголовкa из вывода
-//        curl_setopt($curl, CURLOPT_NOBODY, 0);  // TRUE исключения тела ответа из вывода
-//        curl_setopt($curl, CURLOPT_FAILONERROR, 1);  // TRUE для подробного отчета при неудаче, если полученный HTTP-код больше или равен 400.
-//        curl_setopt($curl, CURLINFO_HEADER_OUT, 1); // для curl_info() TRUE для отслеживания строки запроса дескриптора.
-//        curl_setopt($curl, CURLOPT_FILETIME, 1); // для  curl_info() попытка получения даты модификации удаленного документа
+        curl_setopt($curl, CURLINFO_HEADER_OUT, 1); //true вывод сформированного request заголовкa в curl_info
 
         // HTTPHEADER приорететнее USERAGENT , REFERER , ENCODING  и прочих. Формат  array('Content-type: text/plain', 'Content-length: 100')
         curl_setopt($curl, CURLOPT_HTTPHEADER, Config::get('header'));
-//         curl_setopt($curl, CURLOPT_HTTPHEADER,['X-Requested-With: XMLHttpRequest', 'Accept-Language: ru-RU,ru;q=0.8,en-US;q=0.5,en;q=0.3']);
-//        curl_setopt($curl, CURLOPT_USERAGENT, $agent); // HTTPHEADER приорететнее USERAGENT
+        curl_setopt($curl, CURLOPT_USERAGENT, Config::get('userAgent')); // HTTPHEADER приорететнее USERAGENT
         curl_setopt($curl, CURLOPT_ENCODING, 'utf-8'); // Содержимое заголовка "Accept-Encoding:
-        curl_setopt($curl, CURLOPT_REFERER, 'http://diesel.elcat.kg/'); // Содерж. заг-а "Referer:" -URL с какой страницы пришли
+        curl_setopt($curl, CURLOPT_REFERER, Config::get('referer')); // Содерж. заг-а "Referer:" -URL с какой страницы пришли
 
         curl_setopt($curl, CURLOPT_PROXY, $proxy); // IP HTTP-прокси, через который будут направляться запросы.
         curl_setopt($curl, CURLOPT_HTTPPROXYTUNNEL, 1); //
         curl_setopt($curl, CURLOPT_PROXYTYPE, "CURLPROXY_SOCKS4"); // либо либо CURLPROXY_SOCKS4, CURLPROXY_SOCKS5
 
-
         curl_setopt($curl, CURLOPT_FOLLOWLOCATION, $followlacation);  // FALSE запрет редиректов
-        // работают при CURLOPT_FOLLOWLOCATION = TRUE:
-//        curl_setopt($curl, CURLOPT_MAXREDIRS, 3);  // Максимальное количество принимаемых редиректов
-//        curl_setopt($curl, CURLOPT_POSTREDIR, 2);  // 1 (301 Moved Permanently), 2 (302 Found) и 4 (303 See Other), задают должен ли метод HTTP POST обрабатываться , если произошел указанный тип перенаправления.
-//        curl_setopt($curl, CURLOPT_UNRESTRICTED_AUTH, 1);  // TRUE для продолжения посылки логина и пароля при редиректах, даже при изменении имени хоста.
 
-        curl_setopt($curl, CURLOPT_COOKIEJAR, $cookie);  // файл, куда пишутся куки
-        curl_setopt($curl, CURLOPT_COOKIEFILE, $cookie);  // файл, откуда читаются куки
+        curl_setopt($curl, CURLOPT_COOKIEJAR, Config::get('cookieFile'));  // файл, куда пишутся куки
+        curl_setopt($curl, CURLOPT_COOKIEFILE, Config::get('cookieFile'));  // файл, откуда читаются куки
 //        curl_setopt($curl, CURLOPT_COOKIESESSION, 1); // TRUE для указания текущему сеансу начать новую "сессию" cookies. т.е. игнорирует все "сессионные" cookies, полученные из предыдущей сессии.
 
         curl_setopt($curl, CURLOPT_SSL_VERIFYPEER, 0);  // FALSE для остановки cURL от проверки сертификата узла сети
@@ -145,17 +134,21 @@ class HttpCurl implements IHttpClient
 //        print_r(CookingProxy::$badProxy);
 //        echo 'curl__________$badProxy';//!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
-        $curl = $this->setoptCurl($page, $proxy);
+        $curl = $this->setoptCurl($page);
         try {
             $content = curl_exec($curl);
 
             $resp = curl_getinfo($curl);
-            $this->curlInfo($resp);
+            $this->curlInfo($resp, $page, $curl);
 
             $this->errorResponse($resp['http_code'], $page, $proxy);
 
-        } catch (RequestException $e) {
+            if (!$curl) throw new Exception('Curl not found');
+
+        } catch (Exception $e) {
+            echo 'Curl: ' . $e->getMessage();
         }
+
         curl_close($curl);
 
         $this->saveHTMLPage($content, $page);
@@ -166,6 +159,26 @@ class HttpCurl implements IHttpClient
 
     public function postPage($page, $postData)
     {
+        $curl = $this->setoptCurl($page);
+            curl_setopt($curl, CURLOPT_POST, 1); // TRUE для HTTP POST
+            curl_setopt($curl, CURLOPT_POSTFIELDS, Config::get('postData')); // сами POST переменые
+        try {
+            $content = curl_exec($curl);
+
+            $resp = curl_getinfo($curl);
+            $this->curlInfo($resp, $page, $curl);
+
+            if (!Config::get('postData')) throw new Exception('POST data not found');
+
+        } catch (Exception $e) {
+            echo 'Curl: ' . $e->getMessage();
+        }
+
+        curl_close($curl);
+
+        $this->saveHTMLPage($content, $page);
+
+        return $content;
     }
 
 

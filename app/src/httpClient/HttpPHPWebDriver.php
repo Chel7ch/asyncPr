@@ -11,9 +11,7 @@ use Facebook\WebDriver\WebDriverBy;
 class HttpPHPWebDriver implements IHttpClient
 {
     use LogErrorResponse, SaveHTMLPage;
-    /**
-     * @var RemoteWebDriver
-     */
+
     public $driver;
     public $url;
     public $scratch;
@@ -37,7 +35,6 @@ class HttpPHPWebDriver implements IHttpClient
 
         foreach ($urls as $url) {
             $content[] = $this->getPage($url);
-//                        sleep(1);
         }
 
         return $content;
@@ -48,7 +45,6 @@ class HttpPHPWebDriver implements IHttpClient
         $content = '';
         try {
             $this->driver->get($page);
-//            sleep(1);
 
 //            $this->errResp(http_response_code(), $page);
             $element = $this->driver->findElement(WebDriverBy::tagName('*'));

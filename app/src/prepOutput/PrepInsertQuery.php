@@ -16,7 +16,7 @@ abstract class PrepInsertQuery
             return $query;
         }
 
-        if($tabName == Config::get('tabName') and Config::get('outputWithUrl') == 1) $firstRow = 'INSERT INTO ' . Config::get('tabName') . '(links,';
+        if($tabName == TAB_NAME and Config::get('outputWithUrl') == 1) $firstRow = 'INSERT INTO ' . TAB_NAME . '(links,';
         else $firstRow = 'INSERT INTO ' . $tabName . '(';
 
         $tab = $firstRow;

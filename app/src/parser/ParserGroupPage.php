@@ -23,7 +23,8 @@ class ParserGroupPage extends ParserRoutine
     public $doc;
     public $links = array();
     public $data = array();
-    public static $multiRequest = MULTI_REQUEST;
+    public static $multiRequest;
+//    public static $multiRequest = MULTI_REQUEST;
     public static $workProxy;
     public static $step = 0;
 
@@ -107,7 +108,7 @@ class ParserGroupPage extends ParserRoutine
         if (Config::get('proxyOn') == 1) {
             $listProxy = $this->selectDB('SELECT  field1 FROM  check_proxy');
             if (self::$step == 0) CookingProxy::cook($listProxy, 1);
-            else CookingProxy::cook($listProxy);
+            else CookingProxy::cook($listProxy,Config::get('multiRequest'));
 
             self::$multiRequest = CookingProxy::$multiRequest;
             self::$workProxy = CookingProxy::$workProxy;
