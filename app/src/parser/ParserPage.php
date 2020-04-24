@@ -5,7 +5,6 @@ namespace Parser;
 use Config\Config;
 use DiDom\Document;
 use DiDom\Query;
-use Proxy\CookingProxy;
 
 class ParserPage extends ParserRoutine
 {
@@ -23,8 +22,6 @@ class ParserPage extends ParserRoutine
     public $doc;
     public $paternLinks;
     public $links = array();
-    public static $workProxy;
-    public static $step = 0;
 
     public function __construct()
     {
@@ -77,7 +74,8 @@ class ParserPage extends ParserRoutine
 
             $data[] = $url;
             foreach ($scratches as $scratch) {
-                (Config::get('usingXPATH') == 1) ? $data[] = $page->find($scratch, Query::TYPE_XPATH) : $data[] = $page->find($scratch);
+                (Config::get('usingXPATH') == 1)
+                    ? $data[] = $page->find($scratch, Query::TYPE_XPATH) : $data[] = $page->find($scratch);
             }
             $this->data = $this->output->prepOutput($data);
             $this->query = $this->output->prepInsert($this->data);
@@ -91,7 +89,7 @@ class ParserPage extends ParserRoutine
     public function getLinks($url, $scratches)
     {
         $links = $this->parsLinks($url, $scratches);
-        if(Config::get('writeLogs') == -1)$this->writelogs($links, 'links');
+        if (Config::get('writeLogs') == -1) $this->writelogs($links, 'links');
         return $links;
     }
 
@@ -105,30 +103,6 @@ class ParserPage extends ParserRoutine
     {
         $this->parsLinks($url, $scratches);
         return $this->query;
-    }
-
-    public function proxyOn()
-    {
-        static $i = 0;
-        if (Config::get('proxyOn') == 1) {
-            $listProxy = $this->selectDB('SELECT  field1 FROM  check_proxy');
-            if ($i == 0) {
-                CookingProxy::cook($listProxy, 1);
-                self::$workProxy = CookingProxy::$workProxy;
-                CookingProxy::$firstPage = self::$step;
-                $i++;
-            } else {
-                CookingProxy::$listP = $listProxy;
-                CookingProxy::$firstPage = self::$step;
-                CookingProxy::$attemptWork = 0;
-            }
-        }
-    }
-
-    public function replaceProxy($badProxy)
-    {
-        CookingProxy::replace($badProxy);
-        self::$workProxy = CookingProxy::$workProxy;
     }
 
     public function close()

@@ -3,7 +3,6 @@
 namespace Client;
 
 use Config\Config;
-use Parser\SpiderGroup;
 use Proxy\CookingProxy;
 
 trait LogErrorResponse
@@ -13,7 +12,7 @@ trait LogErrorResponse
     public function errorResponse($response, $url, $proxy = '')
     {
         if ($response != 200) {
-            if ($response == 0 and CookingProxy::$firstPage != 0) {
+            if ($response == 0 and CookingProxy::$firstPage > 1) {
                 CookingProxy::replace($proxy);
 
                 if (!array_search($url, self::$zeroUrl)) {
@@ -47,9 +46,12 @@ trait LogErrorResponse
                 if ($str != '') $list[] = strstr($str, 'http');
             }
             fclose($fp);
+
             file_put_contents($nameFile, '');
 
-            $list = str_replace(array("\r","\n"),"",$list);
+            if ($nameFile == Config::get('zeroErrRespFile')) self::$zeroUrl = array();
+
+            $list = str_replace(array("\r", "\n"), "", $list);
             $list = array_values(array_unique(array_diff($list, array('', 0, null))));
 
             return $list;

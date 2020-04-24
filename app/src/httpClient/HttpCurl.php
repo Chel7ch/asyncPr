@@ -20,21 +20,22 @@ class HttpCurl implements IHttpClient
         $content = array();
         $mh = curl_multi_init();
 
-        if (!empty(CookingProxy::$workProxy)) $proxy = CookingProxy::$workProxy;
-//        print_r($proxy);
-//        echo '__________$proxy';//!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-
-        if (is_array($proxy)) {
-            foreach ($urls as $i => $url) {
-                $conn[$i] = $this->setoptCurl($url, $proxy[$i]);
-                curl_multi_add_handle($mh, $conn[$i]);
-            }
-        } elseif ($proxy == '') {
+        if (Config::get('proxyOn') == 0) {
             foreach ($urls as $i => $url) {
                 $conn[$i] = $this->setoptCurl($url);
                 curl_multi_add_handle($mh, $conn[$i]);
             }
-        } else exit('Сurl input parameters are invalid');
+        } elseif (Config::get('proxyOn') == 1 && !empty(Config::get('workProxy'))) {
+            $proxy = Config::get('workProxy');
+            foreach ($urls as $i => $url) {
+                $conn[$i] = $this->setoptCurl($url, $proxy[$i]);
+                print_r($url);
+                print_r($proxy[$i]);
+                echo '__________$proxy';//!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+                curl_multi_add_handle($mh, $conn[$i]);
+
+            }
+        } else Exit('Curl: proxy not found');
 
 
         do {
@@ -46,7 +47,8 @@ class HttpCurl implements IHttpClient
             curl_multi_remove_handle($mh, $conn[$i]);
 
             $resp = curl_getinfo($conn[$i]);
-            $this->curlInfo($resp,$url, $conn[$i]);
+            $this->curlInfo($resp, $url, $conn[$i]);
+
             @$this->errorResponse($resp['http_code'], $urls[$i], $proxy[$i]);
 
             curl_close($conn[$i]);
@@ -120,21 +122,16 @@ class HttpCurl implements IHttpClient
      * @param string $proxy
      * @return bool|string
      */
-    public function getPage($page, $proxy = '')
+    public function getPage($page)
     {
         $content = '';
-        if (!empty(CookingProxy::$workProxy)) $proxy = join(CookingProxy::$workProxy);
-//        echo '__________getPage curl___________________<br>';
-//        print_r($proxy);
-//        echo 'curl__________$proxy';//!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-//        print_r(CookingProxy::$workProxy);
-//        echo 'curl__________$workProxy';//!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-//        print_r(CookingProxy::$listProxy);
-//        echo 'curl__________$listProxy';//!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-//        print_r(CookingProxy::$badProxy);
-//        echo 'curl__________$badProxy';//!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
-        $curl = $this->setoptCurl($page);
+        if (Config::get('proxyOn') == 0) $proxy = '';
+        elseif (Config::get('proxyOn') == 1 && !empty(Config::get('workProxy')))
+            $proxy = join(Config::get('workProxy'));
+        else Exit('Curl: proxy not found');
+
+        $curl = $this->setoptCurl($page, $proxy);
         try {
             $content = curl_exec($curl);
 
@@ -160,8 +157,8 @@ class HttpCurl implements IHttpClient
     public function postPage($page, $postData)
     {
         $curl = $this->setoptCurl($page);
-            curl_setopt($curl, CURLOPT_POST, 1); // TRUE для HTTP POST
-            curl_setopt($curl, CURLOPT_POSTFIELDS, Config::get('postData')); // сами POST переменые
+        curl_setopt($curl, CURLOPT_POST, 1); // TRUE для HTTP POST
+        curl_setopt($curl, CURLOPT_POSTFIELDS, Config::get('postData')); // сами POST переменые
         try {
             $content = curl_exec($curl);
 

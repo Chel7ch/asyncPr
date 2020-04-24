@@ -119,11 +119,24 @@ class ProxyChecker
         return (integer)join($count);
     }
 
+    public function insertProxy($proxy, $tab = 'check_proxy')
+    {
+        if(Config::get('saveGoodProxyInDB') == 1) $this->saveInDB($proxy);
+        else $this->saveInFile($proxy);
+    }
+
+    public function saveInFile($proxy)
+    {
+        $fd = fopen(Config::get('goodProxyFile'), 'a');
+        fputcsv($fd, $proxy);
+        fclose($fd);
+    }
+
     /**
      * @param string $proxy
      * @param string $tab
      */
-    public function insertProxy($proxy, $tab = 'check_proxy')
+    public function saveInDB($proxy, $tab = 'check_proxy')
     {
         $query = 'INSERT INTO ' . $tab . ' (field1) VALUES(\'' . $proxy . '\')';
         $this->conn->execInsert($query);

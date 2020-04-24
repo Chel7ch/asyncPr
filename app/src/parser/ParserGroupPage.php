@@ -5,7 +5,6 @@ namespace Parser;
 use Config\Config;
 use DiDom\Document;
 use DiDom\Query;
-use Proxy\CookingProxy;
 
 class ParserGroupPage extends ParserRoutine
 {
@@ -24,9 +23,6 @@ class ParserGroupPage extends ParserRoutine
     public $links = array();
     public $data = array();
     public static $multiRequest;
-//    public static $multiRequest = MULTI_REQUEST;
-    public static $workProxy;
-    public static $step = 0;
 
     /**
      * @param array $urls
@@ -34,7 +30,7 @@ class ParserGroupPage extends ParserRoutine
      */
     public function getPages($urls)
     {
-        return $this->client->getGroupPages($urls, self::$workProxy);
+        return $this->client->getGroupPages($urls);
     }
 
     /**
@@ -101,36 +97,6 @@ class ParserGroupPage extends ParserRoutine
     {
         $this->parsLinks($url, $scratches);
         return $this->query;
-    }
-
-    public function proxyOn()
-    {
-        if (Config::get('proxyOn') == 1) {
-            $listProxy = $this->selectDB('SELECT  field1 FROM  check_proxy');
-            if (self::$step == 0) CookingProxy::cook($listProxy, 1);
-            else CookingProxy::cook($listProxy,Config::get('multiRequest'));
-
-            self::$multiRequest = CookingProxy::$multiRequest;
-            self::$workProxy = CookingProxy::$workProxy;
-            CookingProxy::$firstPage = self::$step;
-
-        } else {
-            self::$workProxy = array_fill(0, self::$multiRequest, '');
-        }
-    }
-
-    public function replaceProxy($badProxy)
-    {
-        CookingProxy::replace($badProxy);
-//        if(empty (CookingProxy::$listProxy)){
-        //todo сделать повторный прогон для  новых good proxy
-        self::$multiRequest = CookingProxy::$multiRequest;
-        self::$workProxy = CookingProxy::$workProxy;
-    }
-
-    public function multiRequest()
-    {
-        if (Config::get('proxyOn') == 1) self::$multiRequest = CookingProxy::$multiRequest;
     }
 
 }

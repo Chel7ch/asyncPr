@@ -5,6 +5,11 @@ require_once('../resources/index.php');
 use Config\Config;
 use Config\IoC;
 
+$url = 'https://hidemy.name';
+$url = parse_url($url, 0) . '://' . parse_url($url, 1);
+
+$tail = '/proxy-list/';
+
 $scratch = array(
     '//tbody/tr/td[1]',
     '//tbody/tr/td[2]',
@@ -13,12 +18,10 @@ $scratch = array(
     '//tbody/tr/td[3]//span[@class="country"]',
 );
 
-Config::set('levels', 50); // number of Spider pass levels
+Config::setConfig($url, $scratch, $header,$tail);
+Config::set('levels', 100); // number of Spider pass levels
 Config::set('connectDB', 1); // 1 - turn on writing in DB
 Config::set('proxyOn', 0); // 1 - turn on proxy
-Config::set('tail', '/proxy-list/'); // 1 - turn on proxy
-Config::set('url', 'https://hidemy.name');
-Config::set('tabFields', count($scratch));
 
 
 $clientHTTP = Ioc::resolve('http', 'proxyWebDriver');

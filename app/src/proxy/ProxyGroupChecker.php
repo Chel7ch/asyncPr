@@ -137,11 +137,26 @@ class ProxyGroupChecker
         return (integer)join($this->conn->execSelect($query));
     }
 
+    public function insertProxy($proxy, $tab = 'check_proxy')
+    {
+        if(Config::get('saveGoodProxyInDB') == 1) $this->saveInDB($proxy);
+        else $this->saveInFile($proxy);
+    }
+
+    public function saveInFile($proxy)
+    {
+        $fd = fopen(Config::get('goodProxyFile'), 'a');
+        foreach ($proxy as $pr) {
+            fputs($fd, $pr . PHP_EOL);
+        }
+        fclose($fd);
+    }
+
     /**
      * @param array $proxy
      * @param string $tab
      */
-    public function insertProxy($proxy, $tab = 'check_proxy')
+    public function saveInDB($proxy, $tab = 'check_proxy')
     {
         $query = 'INSERT INTO ' . $tab . ' (field1) VALUES';
         foreach ($proxy as $pr) {
@@ -165,4 +180,5 @@ class ProxyGroupChecker
     {
         $this->conn->cleanTable($nameTable);
     }
+
 }

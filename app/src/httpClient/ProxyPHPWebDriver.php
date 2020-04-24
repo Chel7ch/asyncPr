@@ -8,7 +8,7 @@ use Facebook\WebDriver\WebDriverBy;
 class ProxyPHPWebDriver extends HttpPHPWebDriver implements IHttpClient
 {
 
-    public function getPage($page)
+    public function getPage($page, $proxy = '')
     {
         $content = '';
         static $d = 0;

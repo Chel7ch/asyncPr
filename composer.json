@@ -1,4 +1,3 @@
-
 {
   "require": {
     "guzzlehttp/guzzle": "~6.0",
@@ -17,7 +16,11 @@
       "Prepare\\": "app/src/prepOutput/",
       "DB\\": "app/src/saveResult/",
       "Proxy\\": "app/src/proxy/",
-      "Config\\": "config/"
+      "Config\\": "config/",
+      "Tests\\": "tests/"
     }
+  },
+  "require-dev": {
+    "phpunit/phpunit": "5.7"
   }
 }

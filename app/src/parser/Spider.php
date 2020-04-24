@@ -14,30 +14,28 @@ class Spider extends ParserPage
         $linked = $linked ?? array();
 
         if (empty($links)) {
+            $this->proxyOn();
             $links = $this->firstPage($url, $scratches);
         }
-        self::$step++;
-        $this->proxyOn();
 
         for ($i = 1; $i <= Config::get('levels'); $i++) {
+
+            $this->proxyOn();
+
             list($links, $linked) = $this->parsOneLevel($links, $linked, $scratches);
-            if (Config::get('proxyOn') == 1) list($links, $linked) = $this->forceReadErrResponse($links, $linked, $scratches,Config::get('zeroErrRespFile'));
-//       echo $i.'========================================LEVELS';//!!!!!!!!!!!!!!!!!!!
+            if (Config::get('proxyOn') == 1)
+                list($links, $linked) = $this->forceReadErrResponse($links, $linked, $scratches, Config::get('zeroErrRespFile'));
         }
+
         list($links, $linked) = $this->forceReadErrResponse($links, $linked, $scratches, Config::get('errRespFile'));
 
-        if(Config::get('writeLogs') == 1){
+        if (Config::get('writeLogs') == 1) {
             $this->writelogs($links, 'links');
             $this->writelogs($linked, 'linked');
         }
 
 
-        echo '<pre>';
-        echo '<br>links<br>';
-        print_r($links);
-        echo '<br>linked<br>';
-        print_r($linked);
-        echo '</pre>';
+        require_once("../app/serviceFile.php");
     }
 
     /**
@@ -47,19 +45,10 @@ class Spider extends ParserPage
      */
     public function firstPage($url, $scratches = [])
     {
-        $this->proxyOn();
         $links = $this->getLinks($url, $scratches);
-
         while (empty($links)) {
-            $bad = join(self::$workProxy);
-            $this->replaceProxy($bad);
+            $this->replaceProxy(join(Config::get('workProxy')));
             $links = $this->getLinks($url, $scratches);
-
-            echo '________________________________firstPage___________________<br>';
-            print_r($links);
-            echo '__________$links<br>';//!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-            print_r($bad); echo '__________$bad<br>';//!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-
         }
 
         return $links;
@@ -78,52 +67,44 @@ class Spider extends ParserPage
             $linked[] = $nextLink;
             array_shift($links);
             usleep(Config::get('usleep'));
-
-
-            echo '________________________________parsOneLevel___________________<br>';
-//            print_r(self::$workProxy[$key]);
-//            echo '__________self::$workProxy[$key]<br>';//!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-//            print_r($new);
-//            echo '__________$new<br>';//!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-//            print_r(self::$listProxy);
-//            echo '__________self::$listProxy';//!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-////        print_r(self::$listP);
-////        echo '__________$a';
-//            print_r($badProxy);
-//            echo '__________self::$badProxy';
-//            echo '<br>' . self::$attemptWork . '__________self::$multiRequest';
         }
+
         return array($links, $linked);
     }
 
-    public function forceReadErrResponse($links, $linked, $scratches,$fname)
+    public function forceReadErrResponse($links, $linked, $scratches, $fname)
     {
-        echo $fname. '________________________________forceReadErrResponse enter___________________<br>';//!!!
-
         for ($i = 1; $i <= Config::get('forceReadErrResponseUrl'); $i++) {
             $errorURL = $this->readErrorURL($fname);
-            if (empty($errorURL)){
-                echo '--------------!!!!!!!!!!!!!!!!!!!!!!!=-------------$errorURL<br>';//!!!!!!!
+            if (empty($errorURL)) {
                 return array($links, $linked);
-            } 
-            else {
-                echo $i. '________________________________forceReadErrResponse___________________<br>';
-                print_r($linked);  echo '__________$linked<br>';//!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-                print_r($errorURL);  echo '__________$errorURL<br>';//!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
+            } else {
                 $linked = array_diff($linked, $errorURL);
-                
-                print_r($linked);  echo '__________$linked___array_diff<br>';//!!!!!!!
-                
+
                 list($ln, $linked) = $this->parsOneLevel($errorURL, $linked, $scratches);
                 $links = array_merge($links, $ln);
-
-                print_r($linked);  echo '__________$linked<br>';//!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-                print_r($errorURL);  echo '__________$errorURL<br>';//!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-            print_r($ln);  echo '__________print_r($ln)<br>';//!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-            print_r($links); echo '__________$links';//!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
             }
         }
         return array($links, $linked);
     }
+
+    public function proxyOn()
+    {
+
+        if (Config::get('proxyOn') == 1) {
+            CookingProxy::getList();
+            $listDB = $this->selectDB('SELECT  field1 FROM  check_proxy');
+            CookingProxy::$listPr = array_values(array_unique(array_merge(CookingProxy::$listPr, $listDB)));
+
+            CookingProxy::cooking(1);
+            CookingProxy::$firstPage++;
+        }
+    }
+
+    public function replaceProxy($badProxy)
+    {
+        CookingProxy::replace($badProxy);
+    }
+
 }

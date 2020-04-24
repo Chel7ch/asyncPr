@@ -9,7 +9,7 @@ class Config
 
     public static function setConfig($url, $scratch = [], $header = [], $tail = '')
     {
-        self::$config = require_once(self::FILE);
+        self::$config = require(self::FILE);
     }
 
     public static function getConfig()

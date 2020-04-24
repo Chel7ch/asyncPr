@@ -2,57 +2,50 @@
 
 namespace Proxy;
 
-use Parser\ParserGroupPage;
+use Config\Config;
 
 class CookingProxy
 {
     const ATTEMPT = 5;
-    static public $attemptWork;
-    static public $listProxy = array();
-    static public $listP = array();
-    static public $badProxy;
-    static public $workProxy = array();
-    static public $multiRequest;
+    static private $attemptWork;
+    static private $listProxy = array();
+    static public $listPr = array();
+    static private $badProxy;
+    static private $workProxy = array();
+    static private $multiRequest;
     static public $firstPage;
 
-    public static function cook($listProxy, $count)
+    /**
+     * preparing array workProxy and setup multiRequest
+     * @param int $count
+     */
+    public static function cooking($count)
     {
         self::$attemptWork = 0;
         self::$badProxy = array();
+        self::$listProxy = self::$listPr;
 
-        self::$listProxy = self::$listP = $listProxy;
-        self::$listProxy = array_diff($listProxy, self::$badProxy);
+        if (count(self::$listProxy) >= $count) Config::set('multiRequest', $count);
+        else Config::set('multiRequest', count(self::$listProxy));
 
-        if (count(self::$listProxy) >= $count) self::$multiRequest = $count;
-        else self::$multiRequest = count(self::$listProxy);
+        self::$multiRequest = Config::get('multiRequest');
 
-        self::$workProxy = array_splice(self::$listProxy, 0, self::$multiRequest);
-
-        echo '__________cook___________________________________________<br>';
-        print_r(self::$workProxy); echo '__________self::$workProxy';//!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-        print_r(self::$listProxy); echo '__________self::$listProxy';//!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-        print_r(self::$badProxy); echo '__________self::$badProxy';
-        echo '<br>'. self::$multiRequest.'__________self::$multiRequest';
+        self::$workProxy = array_splice(self::$listProxy, 0, Config::get('multiRequest'));
+        Config::set('workProxy', self::$workProxy);
     }
 
     /**
-     * @param string $badPr
+     * replace bad proxy
+     * @param string $badProxy
      */
-    public static function replace($badPr)
+    public static function replace($badProxy)
     {
+        if (empty($badProxy)) exit('CookingProxy: incoming data is invalid');
 
-        self::$badProxy[] = $badPr;
+        self::$badProxy[] = $badProxy;
 
         $new = array_shift(self::$listProxy);
-        $key = array_search($badPr, self::$workProxy);
-
-        echo '________________________________replace___________________<br>';
-        print_r(self::$workProxy[$key]);echo '__________self::$workProxy[$key]<br>';//!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-        print_r($new);echo '__________$new<br>';//!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-//        print_r(self::$listProxy);echo '__________self::$listProxy';//!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-//        print_r(self::$badProxy);echo '__________self::$badProxy';
-        echo '<br>' . self::$attemptWork . '__________self::$attemptWork';
-
+        $key = array_search($badProxy, self::$workProxy);
 
         if ($new) {
             self::$workProxy[$key] = $new;
@@ -60,14 +53,29 @@ class CookingProxy
         } elseif (count(self::$workProxy) > 1) {
             unset(self::$workProxy[$key]);
             self::$workProxy = array_values(self::$workProxy);
-            self::$multiRequest--;
+            Config::set('multiRequest', Config::get('multiRequest') - 1);
+
         } elseif (count(self::$workProxy) == 1 and self::$attemptWork < self::ATTEMPT) {
-            self::$listProxy = self::$listP;
+            self::$listProxy = self::$listPr;
             self::$badProxy = array();
-            self::$workProxy = array_splice(self::$listProxy, 0, self::$multiRequest);
+            Config::set('multiRequest', self::$multiRequest);
+            self::$workProxy = array_splice(self::$listProxy, 0, Config::get('multiRequest'));
             self::$attemptWork++;
+
         } elseif (count(self::$workProxy) == 1) {
             self::$workProxy = (string)'';
         }
+        Config::set('workProxy', self::$workProxy);
     }
+
+    /** get list workProxy from file */
+    static function getList()
+    {
+        if (file_exists(Config::get('goodProxyFile'))) {
+            $list = file_get_contents(Config::get('goodProxyFile'));
+            $list = explode(' ', str_replace(array("\r", "\n"), " ", $list));
+            self::$listPr = array_diff($list, array('', 0, null));
+        }
+    }
+
 }

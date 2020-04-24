@@ -7,35 +7,36 @@ use Proxy\CookingProxy;
 
 class SpiderGroup extends ParserGroupPage
 {
-    use WriteLogs,\Client\LogErrorResponse;
+    use WriteLogs, \Client\LogErrorResponse;
 
     public function spider($urls, $scratches = [], $links = [], $linked = [])
     {
         $linked = $linked ?? array();
 
         if (empty($links)) {
-            $links =$this->firstPage($urls, $scratches = []);
+            $this->proxyOn();
+            $links = $this->firstPage($urls, $scratches = []);
             $linked = array_merge($linked, $urls);
         }
-        self::$step++;
-        $this->proxyOn();
 
         for ($i = 1; $i <= Config::get('levels'); $i++) {
+
+            $this->proxyOn();
+
             list($links, $linked) = $this->parsOneLevel($links, $linked, $scratches);
-            if (Config::get('proxyOn') == 1) list($links, $linked) = $this->forceReadErrResponse($links, $linked, $scratches,Config::get('zeroErrRespFile'));
+            if (Config::get('proxyOn') == 1)
+                list($links, $linked) = $this->forceReadErrResponse($links, $linked, $scratches, Config::get('zeroErrRespFile'));
         }
 
         list($links, $linked) = $this->forceReadErrResponse($links, $linked, $scratches, Config::get('errRespFile'));
 
-        $this->writelogs($links, 'links');
-        $this->writelogs($linked, 'linked');
+        if (Config::get('writeLogs') == 1) {
+            $this->writelogs($links, 'links');
+            $this->writelogs($linked, 'linked');
+        }
 
-        echo '<pre>';
-        echo '<br>links<br>';
-        print_r($links);
-        echo '<br>linked<br>';
-        print_r($linked);
-        echo '</pre>';
+        require_once("../app/serviceFile.php");
+
     }
 
     /**
@@ -45,12 +46,10 @@ class SpiderGroup extends ParserGroupPage
      */
     public function firstPage($urls, $scratches = [])
     {
-        $this->proxyOn();
         $links = $this->getLinks($urls, $scratches);
 
         while (empty($links)) {
-            $a = join(self::$workProxy);
-            $this->replaceProxy($a);
+            $this->replaceProxy(join(Config::get('workProxy')));
             $links = $this->getLinks($urls, $scratches);
         }
         return $links;
@@ -60,12 +59,11 @@ class SpiderGroup extends ParserGroupPage
     {
         $sub = array();
         while ($links) {
-
-            $this->multiRequest();
-            $urls = array_splice($links, 0, self::$multiRequest);
+            $urls = array_splice($links, 0, Config::get('multiRequest'));
             $subLinks = $this->getLinks($urls, $scratches);
 
-            print_r(self::$multiRequest);echo '___________self::$multiRequest++++++++++++++<br>';//!!!!
+            print_r(Config::get('multiRequest'));
+            echo '___________self::$multiRequest++++++++++++++<br>';//!!!!
             echo 'уровень  ' . '  _  ' . count($linked) . '  в linked  ' . count($links) . '  в $links <br>';
 
             $linked = array_merge($linked, $urls);
@@ -77,15 +75,13 @@ class SpiderGroup extends ParserGroupPage
         return array($sub, $linked);
     }
 
-    public function forceReadErrResponse($links, $linked, $scratches,$fname)
+    public function forceReadErrResponse($links, $linked, $scratches, $fname)
     {
-
         for ($i = 1; $i <= Config::get('forceReadErrResponseUrl'); $i++) {
             $errorURL = $this->readErrorURL($fname);
-            if (empty($errorURL)){
+            if (empty($errorURL)) {
                 return array($links, $linked);
-            }
-            else {
+            } else {
                 $linked = array_diff($linked, $errorURL);
 
                 list($ln, $linked) = $this->parsOneLevel($errorURL, $linked, $scratches);
@@ -94,4 +90,29 @@ class SpiderGroup extends ParserGroupPage
         }
         return array($links, $linked);
     }
+
+    public function proxyOn()
+    {
+        static $multireq;
+
+        if (Config::get('proxyOn') == 1) {
+            CookingProxy::getList();
+            $listDB = $this->selectDB('SELECT  field1 FROM  check_proxy');
+            CookingProxy::$listPr = array_values(array_unique(array_merge(CookingProxy::$listPr, $listDB)));
+            if (CookingProxy::$firstPage > 0) {
+                CookingProxy::cooking($multireq);
+            } else {
+                $multireq = Config::get('multiRequest');
+                CookingProxy::cooking(1);
+                CookingProxy::$firstPage++;
+            }
+//            self::$workProxy = array_fill(0, self::$multiRequest, '');
+        }
+    }
+
+    public function replaceProxy($badProxy)
+    {
+        if (Config::get('proxyOn') == 1) CookingProxy::replace($badProxy);
+    }
+
 }
