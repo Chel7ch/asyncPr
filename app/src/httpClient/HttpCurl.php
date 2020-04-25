@@ -29,11 +29,7 @@ class HttpCurl implements IHttpClient
             $proxy = Config::get('workProxy');
             foreach ($urls as $i => $url) {
                 $conn[$i] = $this->setoptCurl($url, $proxy[$i]);
-                print_r($url);
-                print_r($proxy[$i]);
-                echo '__________$proxy';//!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
                 curl_multi_add_handle($mh, $conn[$i]);
-
             }
         } else Exit('Curl: proxy not found');
 
@@ -128,7 +124,7 @@ class HttpCurl implements IHttpClient
 
         if (Config::get('proxyOn') == 0) $proxy = '';
         elseif (Config::get('proxyOn') == 1 && !empty(Config::get('workProxy')))
-            $proxy = join(Config::get('workProxy'));
+            $proxy = join((array)Config::get('workProxy'));
         else Exit('Curl: proxy not found');
 
         $curl = $this->setoptCurl($page, $proxy);

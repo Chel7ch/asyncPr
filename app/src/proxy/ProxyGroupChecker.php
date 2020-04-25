@@ -39,10 +39,11 @@ class ProxyGroupChecker
      */
     public function ownIp()
     {
+        Config::set('proxyOn', 0);
         $ip = join($this->getGroupPages('', 1));
-
         preg_match('#\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3}#', $ip, $match);
         self::$ownIp = join($match);
+        Config::set('proxyOn', 1);
     }
 
     /**
@@ -94,13 +95,13 @@ class ProxyGroupChecker
 
             while ($selProxy) {
                 $listProxy = array_splice($selProxy, 0, Config::get('multiRequest'));
-
-                $good = (array)$this->diffIP($listProxy);
+                Config::set('workProxy',$listProxy);
+                $good = (array)$this->diffIP(Config::get('workProxy'));
 
                 if (!empty($good)) $this->insertProxy($good);
 
-                $cycle = $cycle + Config::get('multiRequest');//!!!!!!!!!!!
-                $goodProxy = $goodProxy + count($good);//!!!!!!!!!!!
+                $cycle = $cycle + Config::get('multiRequest');
+                $goodProxy = $goodProxy + count($good);
             }
 
             echo '<br><br> Проверенно: ' . $cycle . ' proxy. Найденно: ' . $goodProxy . '<br>';//!!!!!!!!!!!

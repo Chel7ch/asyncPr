@@ -6,6 +6,10 @@ use Config\Config;
 class URLLinksTailCleanLinks implements ICleanLinks
 {
 
+    /**
+     * @param array $links
+     * @return array
+     */
     public function cleanLinks($links)
     {
         $link = array();

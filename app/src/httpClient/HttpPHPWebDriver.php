@@ -10,7 +10,6 @@ use Facebook\WebDriver\Remote\DesiredCapabilities;
 use Facebook\WebDriver\Remote\RemoteWebDriver;
 use Facebook\WebDriver\Remote\WebDriverCapabilityType;
 use Facebook\WebDriver\WebDriverBy;
-use Facebook\WebDriver\WebDriverExpectedCondition;
 
 
 class HttpPHPWebDriver implements IHttpClient
@@ -20,11 +19,8 @@ class HttpPHPWebDriver implements IHttpClient
     public $driver;
     public $url;
     public $scratch;
+    public static $goodWork;
 
-//    public function __construct()
-//    {
-//        $this->getStarted();
-//    }
     /**
      *  browser_type
      *  :firefox => firefox
@@ -38,8 +34,6 @@ class HttpPHPWebDriver implements IHttpClient
         if (Config::get('proxyOn') == 0) $proxy = '';
         elseif (Config::get('proxyOn') == 1 && !empty(Config::get('workProxy'))) {
             $proxy = join(Config::get('workProxy'));
-            print_r($proxy);
-            echo 'getStarted';
         } else Exit('WebDriver: proxy not found');
 
         $host = 'http://localhost:4444/wd/hub';
@@ -51,64 +45,63 @@ class HttpPHPWebDriver implements IHttpClient
             $options->addArguments(['--window-size=571,500',]);
 //        $options->addArguments(["--headless"]);
             if (Config::get('proxyOn') == 1) {
-
                 $options->addArguments(['--proxy-server=http://' . $proxy,]);
+                $options->addArguments(['--user-data-dir=' . CHRPME_PROFILE,]);
             }
             $capabilities->setCapability(ChromeOptions::CAPABILITY, $options);
 
         } elseif ($browserType == 'firefox') {
-//            $capabilities->setCapability('moz:firefoxOptions',['args' => ['-headless']]);
+            $capabilities->setCapability('moz:firefoxOptions', ['args' => ['-headless']]);
         }
         $this->driver = RemoteWebDriver::create($host, $capabilities);
     }
 
     public function getPage($page, $proxy = '')
     {
-        static $goodWork = 0;
         $source = '';
-        if ($goodWork == 0) $this->getStarted();
-        $goodWork++;
+
+        if (self::$goodWork == 0) $this->getStarted();
+        self::$goodWork++;
 
         try {
             $this->driver->get($page);
-
             $source = $this->driver->getPageSource();
-            $this->source =$source;
+
+            if (Config::get('proxyOn') == 1) {
+                $resp = $this->errorRespZero($source);
+                if ($resp) $this->errorResponse('0', $page);
+            }
 
         } catch (WebDriverException $e) {
-            $goodWork = 0;
-//            $page = strstr($page, 'javascript:', true);
-
+            self::$goodWork = 0;
             CookingProxy::replace(Config::get('workProxy'));
-//            $this->close();
-            print_r('.............catch<br>');
-//            if (Config::get('proxyOn') == 1)
-//                $this->errorRespZero($this->source, $page, $proxy);
-//            else $this->errorResponse('999', $page, $proxy);
-
-            echo '<br>' . $proxy . '  --------------$proxy____________<br>';
+            $this->close();
+            echo '..............catch<br>';//!!!!!!!!!!!!!!!!!!!!!!!!!!!!
         }
-//        $this->saveHTMLPage($source, $page);
+        $this->saveHTMLPage($source, $page);
 
         return $source;
     }
 
-    public function errorRespZero($content, $page, $proxy)
+    public function errorRespZero($content)
     {
+        $response = '';
         if (strpos($content, 'ERR_PROXY_CONNECTION_FAILED') or
             strpos($content, 'ERR_PROXY_CONNECTION_FAILED') or
+            strpos($content, 'ERR_TIMED_OUT') or
+            strpos($content, 'ERR_CONNECTION_CLOSED') or
             strpos($content, 'ERR_EMPTY_RESPONSE')) {
-            sleep(8);
-//            $this->close();
-//            $this->getStarted();
+
             CookingProxy::replace(Config::get('workProxy'));
-            echo '4444444444444444444444444444444444444444444444';
-//            $this->getPage($page);
+            self::$goodWork = 0;
+            $this->close();
+            echo '..............errorRespZero<br>';//!!!!!!!!!!!!
+            $response = 0;
         }
-        CookingProxy::replace(Config::get('workProxy'));
+        return $response;
     }
 
-    public function getGroupPages($urls, $proxy = '')
+    public function getGroupPages($urls)
     {
         $content = array();
 
@@ -139,5 +132,6 @@ class HttpPHPWebDriver implements IHttpClient
     public function close()
     {
         $this->driver->close();
+        $this->driver->quit();
     }
 }

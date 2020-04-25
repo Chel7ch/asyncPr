@@ -7,7 +7,7 @@ $project = parse_url($url, 1);
 @define('PROJECT_DIR', SCRIPT_DIR . '/storage/projects/' . $project);
 @define('PROJECT', $project);
 @define('TAB_NAME', str_replace('.', '_', $project));
-//define('MULTI_REQUEST', 5); // number of concurrent requests
+@define('CHRPME_PROFILE', 'C:\Users\Dm\AppData\Local\Google\Chrome\User Data\Profile 1');
 
 return [
     'project' => PROJECT,
@@ -25,7 +25,7 @@ return [
     'cookieFile' => SCRIPT_DIR . '/storage/logs/cookie.txt',
     'errRespFile' => SCRIPT_DIR . '/storage/projects/' . $project . '/logs/err_response.csv',
     'zeroErrRespFile' => SCRIPT_DIR . '/storage/projects/' . $project . '/logs/zero_err_response.csv',
-    'goodProxyFile' => SCRIPT_DIR . '/storage/good_proxy.csv',
+    'goodProxyFile' => SCRIPT_DIR . '/storage/logs/good_proxy.csv',
     /** DB */
     'connectDB' => '0', // 1 - turn on writing in DB
     'tabName' => TAB_NAME,
@@ -52,7 +52,7 @@ return [
     'workProxy' => array(),
     'multiRequest' => 5, // number of parallel requests
     'countGoodProxy' => 1000,  // the number of proxies at which the check will end; -1 without limits
-    'saveGoodProxyInDB' => 1,  // 1 - save good proxies in DB ; 0 - save in file
+    'saveGoodProxyInDB' => 0,  // 1 - save good proxies in DB ; 0 - save in file
     /** HTTP*/
     'curlHTTPInfo' => 0, // 1 - turn on Curl HTTP_InFo, 2 - detailed Curl HTTP_InFo
     'respTimeout' => 5, // number of seconds timeout

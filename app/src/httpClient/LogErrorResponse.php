@@ -36,7 +36,7 @@ trait LogErrorResponse
         fclose($fd);
     }
 
-    public function readErrorURL($nameFile)//!!!!!!!!!!!!!
+    public function readErrorURL($nameFile)
     {
         $list = array();
 

@@ -42,10 +42,12 @@ class ProxyChecker
         static $cycle = 1;
 
         if ($own == 0) {
+            Config::set('proxyOn', 0);
             $ip = $this->getPage();
             preg_match('#\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3}#', $ip, $match);
             $ownIp = implode('', $match);
             $own++;
+            Config::set('proxyOn', 1);
         }
 
         $pr = $this->getPage($proxy);
@@ -83,7 +85,9 @@ class ProxyChecker
         while (self::$goodProxy < Config::get('countGoodProxy') or Config::get('countGoodProxy') == -1) {
 
             foreach ($selProxy as $proxy) {
-                $this->diffIP($proxy);
+                Config::set('workProxy',$proxy);
+                $this->diffIP(Config::get('workProxy'));
+
             }
             $rowId += self::REQUEST_AT_TIME;
 
@@ -121,14 +125,14 @@ class ProxyChecker
 
     public function insertProxy($proxy, $tab = 'check_proxy')
     {
-        if(Config::get('saveGoodProxyInDB') == 1) $this->saveInDB($proxy);
+        if (Config::get('saveGoodProxyInDB') == 1) $this->saveInDB($proxy);
         else $this->saveInFile($proxy);
     }
 
     public function saveInFile($proxy)
     {
         $fd = fopen(Config::get('goodProxyFile'), 'a');
-        fputcsv($fd, $proxy);
+        fputcsv($fd, (array)$proxy);
         fclose($fd);
     }
 
