@@ -7,7 +7,7 @@ $project = parse_url($url, 1);
 @define('PROJECT_DIR', SCRIPT_DIR . '/storage/projects/' . $project);
 @define('PROJECT', $project);
 @define('TAB_NAME', str_replace('.', '_', $project));
-@define('CHRPME_PROFILE', 'C:\Users\Dm\AppData\Local\Google\Chrome\User Data\Profile 1');
+@define('CHROME_PROFILE', 'C:\Users\Dm\AppData\Local\Google\Chrome\User Data\Profile 1');
 
 return [
     'project' => PROJECT,

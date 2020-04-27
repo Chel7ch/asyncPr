@@ -6,10 +6,11 @@ namespace Prepare;
 
 use Config\Config;
 
+/** prepare  data from hidemy.name for use. */
+
 class PrHidemyName extends PrepInsertQuery implements IPrepareOutput
 {
     /**
-     * prepare  data from hidemy.name for use.
      * @param array $data
      * @return array
      */

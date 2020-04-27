@@ -2,6 +2,7 @@
 
 namespace DB;
 
+/** the connection settings to the database  */
 class DBConfig
 {
     const PATH_TO_SQLITE_FILE = PROJECT_DIR . '/db/' . PROJECT . '.db';

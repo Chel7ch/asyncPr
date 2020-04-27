@@ -4,11 +4,15 @@ namespace Prepare;
 
 use Config\Config;
 
+/**  Create string to query to DB */
+
 abstract class PrepInsertQuery
 {
-//    public static $tabName = TAB_NAME ;
-    public static $tabName;
-
+    /**
+     * @param array $data
+     * @param string $tabName
+     * @return string
+     */
     public function prepInsert($data, $tabName = TAB_NAME )
     {
         $query = '';

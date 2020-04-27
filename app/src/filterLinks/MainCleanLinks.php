@@ -5,6 +5,7 @@ namespace FilterLinks;
 use Config\Config;
 
 /** Removes unnecessary links from the set */
+
 class MainCleanLinks implements ICleanLinks
 {
     /**
@@ -81,4 +82,5 @@ class MainCleanLinks implements ICleanLinks
 
         return $link;
     }
+
 }

@@ -5,6 +5,8 @@ namespace DB;
 use PDO;
 use PDOException;
 
+/** setting MySQL database connection */
+
 class MYSQLConnection implements IDBConnection
 {
 

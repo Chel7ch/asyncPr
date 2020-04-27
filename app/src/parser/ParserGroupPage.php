@@ -10,19 +10,10 @@ class ParserGroupPage extends ParserRoutine
 {
     use WriteLogs;
 
-    /**
-     * @var array scratch  XML expressions for searching on a page. Needs of benefits
-     * @var object client HTTP client
-     * @var object connect PDO
-     * @var array linked reviewed links
-     * @var string doc DiDom page
-     */
-    public $client;
-    public $connect;
-    public $doc;
     public $links = array();
+    public $paternLinks;
     public $data = array();
-    public static $multiRequest;
+    public $query;
 
     /**
      * @param array $urls
@@ -39,13 +30,21 @@ class ParserGroupPage extends ParserRoutine
      */
     protected function parsPages($urls)
     {
-        $pages = array();//!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+        $pages = array();
         $docs = $this->getPages($urls);
         foreach ($docs as $key => $doc) {
-            if (empty($doc)) break;//!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+            if (empty($doc)) break;
             $pages[$key] = new Document($doc);
         }
         return $pages;
+    }
+
+    /**
+     * @param string $links XPATH|DIDom query
+     */
+    public function setPaternLinks($links = '//a/@href')
+    {
+        $this->paternLinks = $links;
     }
 
     /**
@@ -82,20 +81,35 @@ class ParserGroupPage extends ParserRoutine
         return $this->links;
     }
 
-    public function getLinks($url, $scratches)
+    /**
+     * @param array $urls
+     * @param array $scratches
+     * @return array
+     */
+    public function getLinks($urls, $scratches)
     {
-        return $this->parsLinks($url, $scratches);
+        return $this->parsLinks($urls, $scratches);
     }
 
-    public function getBenefit($url, $scratches)
+    /**
+     * @param array $urls
+     * @param array $scratches
+     * @return array
+     */
+    public function getBenefit($urls, $scratches)
     {
-        $this->parsLinks($url, $scratches);
+        $this->parsLinks($urls, $scratches);
         return $this->data;
     }
 
-    public function getQuery($url, $scratches)
+    /**
+     * @param array $urls
+     * @param array $scratches
+     * @return array
+     */
+    public function getQuery($urls, $scratches)
     {
-        $this->parsLinks($url, $scratches);
+        $this->parsLinks($urls, $scratches);
         return $this->query;
     }
 

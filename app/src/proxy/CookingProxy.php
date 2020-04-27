@@ -68,7 +68,7 @@ class CookingProxy
         Config::set('workProxy', self::$workProxy);
     }
 
-    /** get list workProxy from file */
+    /** get list workProxy from the file */
     static function getList()
     {
         if (file_exists(Config::get('goodProxyFile'))) {

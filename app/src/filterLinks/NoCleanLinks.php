@@ -2,6 +2,8 @@
 
 namespace FilterLinks;
 
+/** It's change nothing */
+
 class NoCleanLinks implements ICleanLinks
 {
     /**

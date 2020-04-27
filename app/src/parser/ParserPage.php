@@ -10,18 +10,11 @@ class ParserPage extends ParserRoutine
 {
     use WriteLogs;
 
-    /**
-     * @var array scratch  XML expressions for searching on a page. Needs of benefits
-     * @var object client HTTP client
-     * @var object connect PDO
-     * @var array linked reviewed links
-     * @var string doc DiDom page
-     */
-    public $client;
-    public $connect;
+    public $links = array();
     public $doc;
     public $paternLinks;
-    public $links = array();
+    public $data = array();
+    public $query;
 
     public function __construct()
     {
@@ -52,14 +45,17 @@ class ParserPage extends ParserRoutine
         return $page;
     }
 
+    /**
+     * @param string $links XPATH|DIDom query
+     */
     public function setPaternLinks($links = '//a/@href')
     {
         $this->paternLinks = $links;
     }
 
     /**
-     * pulls links from page
-     * @param $url
+     * Pulls links from page
+     * @param string $url
      * @param array $scratches
      * @return array
      */
@@ -86,6 +82,11 @@ class ParserPage extends ParserRoutine
         return $this->links;
     }
 
+    /**
+     * @param string $url
+     * @param array $scratches
+     * @return array
+     */
     public function getLinks($url, $scratches)
     {
         $links = $this->parsLinks($url, $scratches);
@@ -93,12 +94,22 @@ class ParserPage extends ParserRoutine
         return $links;
     }
 
+    /**
+     * @param string $url
+     * @param array $scratches
+     * @return array
+     */
     public function getBenefit($url, $scratches)
     {
         $this->parsLinks($url, $scratches);
         return $this->data;
     }
 
+    /**
+     * @param string $url
+     * @param array $scratches
+     * @return array
+     */
     public function getQuery($url, $scratches)
     {
         $this->parsLinks($url, $scratches);

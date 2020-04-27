@@ -8,21 +8,22 @@ use Config\Config;
 class DBCreateTable
 {
 
-
     public function __construct(IDBConnection $sql)
     {
         $this->sql = $sql;
     }
 
+    /** connect to DB */
     public function connect()
     {
         return $this->sql->connect();
     }
 
+    /** create new tables */
     public function createTable()
     {
 
-        $tb = 'CREATE TABLE IF NOT EXISTS ' . TAB_NAME .'(';
+        $tb = 'CREATE TABLE IF NOT EXISTS ' . TAB_NAME . '(';
         $tb .= ' id int(6)  AUTO_INCREMENT PRIMARY KEY,';
         $tb .= ' links TEXT,';
         for ($i = 1; $i <= Config::get('tabFields'); $i++)
@@ -38,7 +39,7 @@ class DBCreateTable
          * field5 - failure
          * field6 - DATETIME
          */
-        $commands = [ $tb,
+        $commands = [$tb,
             'CREATE TABLE IF NOT EXISTS collect_proxy (
             id int(6) AUTO_INCREMENT PRIMARY KEY,
             field1  VARCHAR (22) NOT NULL,

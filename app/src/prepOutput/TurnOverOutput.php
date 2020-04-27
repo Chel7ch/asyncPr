@@ -4,9 +4,14 @@ namespace Prepare;
 
 use Config\Config;
 
+/**Get benefit data  and  prepare for use. One value of each array per row */
+
 class TurnOverOutput extends PrepInsertQuery implements IPrepareOutput
 {
-
+    /**
+     * @param array $data
+     * @return array
+     */
     public function prepOutput($data)
     {
         /** deff count arrays

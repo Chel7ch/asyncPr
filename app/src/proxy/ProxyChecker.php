@@ -15,11 +15,6 @@ class ProxyChecker
     const CHECKER = 'http://razrabotkaweb.ru/ip.php';
 //    const CHECKER = 'http://httpbin.org/ip';
 
-    /** @param IHttpClient $client */
-    public function setHttpClient(IHttpClient $client)
-    {
-        $this->client = $client;
-    }
 
     /**
      * @param string $proxy
@@ -85,7 +80,7 @@ class ProxyChecker
         while (self::$goodProxy < Config::get('countGoodProxy') or Config::get('countGoodProxy') == -1) {
 
             foreach ($selProxy as $proxy) {
-                Config::set('workProxy',$proxy);
+                Config::set('workProxy', $proxy);
                 $this->diffIP(Config::get('workProxy'));
 
             }
@@ -101,7 +96,7 @@ class ProxyChecker
 
     /**
      * @param int $rowId
-     * @param string $tab
+     * @param string $tab tab name
      * @return array
      */
     public function selectProxy($rowId, $tab = 'collect_proxy')
@@ -112,8 +107,8 @@ class ProxyChecker
     }
 
     /**
-     * @param string $tab
-     * @return int
+     * @param string $tab tab name
+     * @return int number of entries in the table
      */
     public function selectCount($tab = 'collect_proxy')
     {
@@ -123,12 +118,20 @@ class ProxyChecker
         return (integer)join($count);
     }
 
+    /**
+     * @param array $proxy
+     * @param string $tab tab name
+     */
     public function insertProxy($proxy, $tab = 'check_proxy')
     {
         if (Config::get('saveGoodProxyInDB') == 1) $this->saveInDB($proxy);
         else $this->saveInFile($proxy);
     }
 
+    /**
+     * saves a list of good proxies in the file
+     * @param array $proxy
+     */
     public function saveInFile($proxy)
     {
         $fd = fopen(Config::get('goodProxyFile'), 'a');
@@ -137,8 +140,9 @@ class ProxyChecker
     }
 
     /**
+     * saves a list of good proxies in the table
      * @param string $proxy
-     * @param string $tab
+     * @param string $tab tab name
      */
     public function saveInDB($proxy, $tab = 'check_proxy')
     {
@@ -159,4 +163,11 @@ class ProxyChecker
     {
         $this->conn->cleanTable($nameTable);
     }
+
+    /** @param IHttpClient $client */
+    public function setHttpClient(IHttpClient $client)
+    {
+        $this->client = $client;
+    }
+
 }

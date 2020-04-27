@@ -4,6 +4,8 @@ namespace FilterLinks;
 
 use Config\Config;
 
+/** Return the necessary links from the list */
+
 class PaginatorCleanLinks implements ICleanLinks
 {
 
@@ -29,6 +31,8 @@ class PaginatorCleanLinks implements ICleanLinks
             }
         }
         if (!empty($link)) $link = array_values(array_unique($link));
+
         return $link;
     }
+
 }

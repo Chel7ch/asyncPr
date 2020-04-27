@@ -8,11 +8,11 @@ use Facebook\WebDriver\Chrome\ChromeOptions;
 use Facebook\WebDriver\Exception\WebDriverException;
 use Facebook\WebDriver\Remote\DesiredCapabilities;
 use Facebook\WebDriver\Remote\RemoteWebDriver;
-use Facebook\WebDriver\Remote\WebDriverCapabilityType;
 use Facebook\WebDriver\WebDriverBy;
 
+/** HTTP client */
 
-class HttpPHPWebDriver implements IHttpClient
+class HttpPHPWebDriver
 {
     use LogErrorResponse, SaveHTMLPage;
 
@@ -28,7 +28,7 @@ class HttpPHPWebDriver implements IHttpClient
      *  :chrome  => chrome
      *  :ie      => microsoftEdge     *
      */
-    private function getStarted()
+    protected function getStarted()
     {
         $browserType = Config::get('browserType');
 
@@ -47,7 +47,7 @@ class HttpPHPWebDriver implements IHttpClient
 //        $options->addArguments(["--headless"]);
             if (Config::get('proxyOn') == 1) {
                 $options->addArguments(['--proxy-server=http://' . $proxy,]);
-                $options->addArguments(['--user-data-dir=' . CHRPME_PROFILE,]);
+                $options->addArguments(['--user-data-dir=' . CHROME_PROFILE,]);
             }
             $capabilities->setCapability(ChromeOptions::CAPABILITY, $options);
 
@@ -90,7 +90,7 @@ class HttpPHPWebDriver implements IHttpClient
     }
 
     /**
-     * changing the proxy
+     * changing bsd proxy
      * @param string $content
      * @return string
      */

@@ -9,6 +9,13 @@ class Spider extends ParserPage
 {
     use WriteLogs, \Client\LogErrorResponse;
 
+    /**
+     * Bypass all pages
+     * @param string $url
+     * @param array $scratches
+     * @param array $links
+     * @param array $linked
+     */
     public function spider($url, $scratches, $links = [], $linked = [])
     {
         $linked = $linked ?? array();
@@ -39,6 +46,7 @@ class Spider extends ParserPage
     }
 
     /**
+     * Get links from first page
      * @param string $url
      * @param array $scratches
      * @return array
@@ -55,6 +63,13 @@ class Spider extends ParserPage
         return $links;
     }
 
+    /**
+     * Bypass all links at one level
+     * @param array $links
+     * @param array $linked
+     * @param array $scratches
+     * @return array
+     */
     public function parsOneLevel($links, $linked, $scratches)
     {
         foreach ($links as $nextLink) {
@@ -73,6 +88,14 @@ class Spider extends ParserPage
         return array($links, $linked);
     }
 
+    /**
+     * Bypass all missing links from errFile
+     * @param array $links
+     * @param array $linked
+     * @param array $scratches
+     * @param string $fname
+     * @return array
+     */
     public function forceReadErrResponse($links, $linked, $scratches, $fname)
     {
         for ($i = 1; $i <= Config::get('forceReadErrResponseUrl'); $i++) {
@@ -90,6 +113,9 @@ class Spider extends ParserPage
         return array($links, $linked);
     }
 
+    /**
+     * Get list good proxy
+     */
     public function proxyOn()
     {
 
@@ -103,6 +129,10 @@ class Spider extends ParserPage
         }
     }
 
+    /**
+     * Replace bad proxy
+     * @param string $badProxy
+     */
     public function replaceProxy($badProxy)
     {
         CookingProxy::replace($badProxy);

@@ -17,7 +17,7 @@ class ReadSavedFiles extends ParserRoutine
     }
 
     /**
-     * @param  $fName
+     * @param  string $fName
      * @return \DiDom\Document
      */
     public function getFile($fName)
@@ -27,9 +27,8 @@ class ReadSavedFiles extends ParserRoutine
 
     /**
      * Crawling files from  storage/progects/../htmlPages
-     * @param $scratch
+     * @param array $scratch
      * @param string $patern
-     * @return void
      */
     public function rollFiles($scratch, $patern = '\w+')
     {
@@ -44,7 +43,6 @@ class ReadSavedFiles extends ParserRoutine
      * @param $page DiDom object
      * @param string $url
      * @param array $scratches
-     * @return void
      */
     private function parsFile($page, $url, $scratches = [])
     {
@@ -64,6 +62,10 @@ class ReadSavedFiles extends ParserRoutine
         } else (new \DB\FileExecute)->execInsert($this->data);
     }
 
+    /**
+     * @param string $patern
+     * @return array
+     */
     public function getLinks($patern = '\w+')
     {
         $match = array();
@@ -79,6 +81,11 @@ class ReadSavedFiles extends ParserRoutine
         return $match;
     }
 
+    /**
+     * @param string $fname
+     * @param array $scratches
+     * @return array
+     */
     public function getBenefit($fname, $scratches)
     {
         $doc = Config::get('saveHTMLDir') . '/' . $fname;
@@ -91,6 +98,11 @@ class ReadSavedFiles extends ParserRoutine
         return $this->data;
     }
 
+    /**
+     * @param string $fname
+     * @param array $scratches
+     * @return string
+     */
     public function getQuery($fname, $scratches)
     {
         $this->getBenefit($fname, $scratches);

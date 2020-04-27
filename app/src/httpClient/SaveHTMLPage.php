@@ -4,6 +4,8 @@ namespace Client;
 
 use Config\Config;
 
+/** Save Html pages in file */
+
 trait SaveHTMLPage
 {
     public function saveHTMLPage($html, $name)

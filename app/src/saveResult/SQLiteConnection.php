@@ -3,6 +3,8 @@ namespace DB;
 
 use PDO;
 
+/** setting SQLite database connection */
+
 class SQLiteConnection implements IDBConnection
 {
     private $pdo;

@@ -16,50 +16,42 @@ class ProxyGroupChecker
     const CHECKER = 'http://razrabotkaweb.ru/ip.php';
 //    const CHECKER = 'http://httpbin.org/ip';
 
-    /** @param IHttpClient $client */
-    public function setHttpClient(IHttpClient $client)
-    {
-        $this->client = $client;
-    }
 
     /**
+     * @param int $multiRequest
      * @param mixed $proxy
-     * @param int $request
      * @return array  IP addresses
      */
-    public function getGroupPages($proxy = '')
+    public function getGroupPages($multiRequest, $proxy = '')
     {
-        $urls = array_fill(0, Config::get('multiRequest'), self::CHECKER);
+        $urls = array_fill(0, $multiRequest, self::CHECKER);
         return $this->client->getGroupPages($urls, $proxy);
     }
 
-    /**
-     * @param void
-     * @return void
-     */
+    /** definition own Ip */
     public function ownIp()
     {
         Config::set('proxyOn', 0);
-        $ip = join($this->getGroupPages('', 1));
+        $ip = join($this->getGroupPages(1,''));
         preg_match('#\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3}#', $ip, $match);
         self::$ownIp = join($match);
         Config::set('proxyOn', 1);
     }
 
     /**
-     * compares received list with your real ip address
+     * compares received list proxy with your real ip address
      * @param array $listProxy
-     * @return array
+     * @return array good proxy
      */
     public function diffIP($listProxy)
     {
         $ip = array();
 
-        $pr = $this->getGroupPages($listProxy);
+        $pr = $this->getGroupPages(Config::get('multiRequest'),$listProxy);
 
         foreach ($pr as $key => $proxy) {
             if (empty($proxy)) {
-                echo '<br>Плохой proxy '. $listProxy[$key] .' Нет ответа.';
+                echo '<br>Плохой proxy ' . $listProxy[$key] . ' Нет ответа.';
                 continue;
 
             } elseif (strlen($proxy) < 50) {
@@ -69,12 +61,12 @@ class ProxyGroupChecker
                 if ($receiveIp and $receiveIp != self::$ownIp) {
                     $ip[] = $listProxy[$key];
 
-                    echo '<br><br>+++++++  ' . $listProxy[$key] . '________________'.$receiveIp.'<br>';//!!!!!!!!
+                    echo '<br><br>+++++++  ' . $listProxy[$key] . '________________' . $receiveIp . '<br>';//!!!!!!!!
 
                 } elseif ($receiveIp and $receiveIp == self::$ownIp) {
                     echo '<br>Ответ: ' . $receiveIp . ' Вместо ' . @$listProxy[$key] . ' . Прозрачный прокси.';//!!!!!!
-                }else echo '<br>Плохой proxy '.$listProxy[$key].' Отказ.';
-            } else echo '<br>Плохой proxy '.$listProxy[$key].' Отказ';
+                } else echo '<br>Плохой proxy ' . $listProxy[$key] . ' Отказ.';
+            } else echo '<br>Плохой proxy ' . $listProxy[$key] . ' Отказ';
         }
 
         return $ip;
@@ -95,7 +87,7 @@ class ProxyGroupChecker
 
             while ($selProxy) {
                 $listProxy = array_splice($selProxy, 0, Config::get('multiRequest'));
-                Config::set('workProxy',$listProxy);
+                Config::set('workProxy', $listProxy);
                 $good = (array)$this->diffIP(Config::get('workProxy'));
 
                 if (!empty($good)) $this->insertProxy($good);
@@ -128,8 +120,8 @@ class ProxyGroupChecker
     }
 
     /**
-     * @param string $tab
-     * @return int
+     * @param string $tab tab name
+     * @return int number of entries in the table
      */
     public function selectCount($tab = 'collect_proxy')
     {
@@ -138,12 +130,20 @@ class ProxyGroupChecker
         return (integer)join($this->conn->execSelect($query));
     }
 
+    /**
+     * @param array $proxy
+     * @param string $tab tab name
+     */
     public function insertProxy($proxy, $tab = 'check_proxy')
     {
-        if(Config::get('saveGoodProxyInDB') == 1) $this->saveInDB($proxy);
+        if (Config::get('saveGoodProxyInDB') == 1) $this->saveInDB($proxy);
         else $this->saveInFile($proxy);
     }
 
+    /**
+     * saves a list of good proxies in the file
+     * @param array $proxy
+     */
     public function saveInFile($proxy)
     {
         $fd = fopen(Config::get('goodProxyFile'), 'a');
@@ -154,6 +154,7 @@ class ProxyGroupChecker
     }
 
     /**
+     * saves a list of good proxies in the table
      * @param array $proxy
      * @param string $tab
      */
@@ -180,6 +181,12 @@ class ProxyGroupChecker
     public function cleanTable($nameTable = 'check_proxy')
     {
         $this->conn->cleanTable($nameTable);
+    }
+
+    /** @param IHttpClient $client */
+    public function setHttpClient(IHttpClient $client)
+    {
+        $this->client = $client;
     }
 
 }

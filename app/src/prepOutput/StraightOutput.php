@@ -4,8 +4,13 @@ namespace Prepare;
 
 use Config\Config;
 
+/**   Get benefit data  and  prepare for use. One array to one row */
 class StraightOutput extends  PrepInsertQuery implements IPrepareOutput
 {
+    /**
+     * @param array $data
+     * @return array
+     */
     public function prepOutput($data)
     {
         $str = '';

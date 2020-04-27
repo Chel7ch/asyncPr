@@ -4,6 +4,8 @@ namespace FilterLinks;
 
 use Config\Config;
 
+/** Сhanges each received link from the list */
+
 class URLTailLinksCleanLinks implements ICleanLinks
 {
 

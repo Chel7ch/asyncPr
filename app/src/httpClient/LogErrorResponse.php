@@ -5,10 +5,19 @@ namespace Client;
 use Config\Config;
 use Proxy\CookingProxy;
 
+
+/**
+ * Writes and reads URLs of rejected pages
+ */
 trait LogErrorResponse
 {
     public static $zeroUrl = array();
 
+    /**
+     * @param int $response
+     * @param $url
+     * @param string $proxy bad proxy
+     */
     public function errorResponse($response, $url, $proxy = '')
     {
         if ($response != 200) {
@@ -19,23 +28,33 @@ trait LogErrorResponse
                     self::$zeroUrl[] = $url;
 
                     $errReq = array($url);
-                    $this->writeErrResp($errReq, Config::get('zeroErrRespFile'));
+                    $this->writeErrResp($errReq, $url, Config::get('zeroErrRespFile'));
                 }
             } elseif ($response != 0) {
                 $errReq = array($response, $url);
-                $this->writeErrResp($errReq, Config::get('errRespFile'));
+                $this->writeErrResp($errReq, $url, Config::get('errRespFile'));
             }
         }
     }
 
-    public function writeErrResp($errReq, $nameFile)
+    /**
+     * @param int $errReq
+     * @param string $url
+     * @param string $nameFile
+     */
+    public function writeErrResp($errReq, $url, $nameFile)
     {
         file_exists(Config::get('logErrRespDir')) ?: mkdir(Config::get('logErrRespDir'));
+        $row = array($errReq, $url);
         $fd = fopen($nameFile, 'a');
-        fputcsv($fd, $errReq);
+        fputcsv($fd, $row);
         fclose($fd);
     }
 
+    /**
+     * @param string $nameFile
+     * @return array
+     */
     public function readErrorURL($nameFile)
     {
         $list = array();
@@ -53,8 +72,8 @@ trait LogErrorResponse
 
             $list = str_replace(array("\r", "\n"), "", $list);
             $list = array_values(array_unique(array_diff($list, array('', 0, null))));
-
-            return $list;
         }
+        
+        return $list;
     }
 }

@@ -2,28 +2,37 @@
 
 namespace Parser;
 
+use Client\IHttpClient;
+use FilterLinks\ICleanLinks;
+use Prepare\IPrepareOutput;
+
 abstract class ParserRoutine
 {
+    public $client;
+    public $filter;
+    public $output;
+    public $conn;
+
     /**
-     * @param \Client\IHttpClient $client
+     * @param IHttpClient $client
      */
-    public function setHttpClient(\Client\IHttpClient $client)
+    public function setHttpClient(IHttpClient $client)
     {
         $this->client = $client;
     }
 
     /**
-     * @param \FilterLinks\ICleanLinks $cleanLinks
+     * @param ICleanLinks $cleanLinks
      */
-    public function setCleanLinks(\FilterLinks\ICleanLinks $cleanLinks)
+    public function setCleanLinks(ICleanLinks $cleanLinks)
     {
         $this->filter = $cleanLinks;
     }
 
     /**
-     * @param \Prepare\IPrepareOutput $output
+     * @param IPrepareOutput $output
      */
-    public function setOutput(\Prepare\IPrepareOutput $output)
+    public function setOutput(IPrepareOutput $output)
     {
         $this->output = $output;
     }

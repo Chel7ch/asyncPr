@@ -3,38 +3,29 @@
 namespace Client;
 
 use Config\Config;
+use Proxy\CookingProxy;
 use Facebook\WebDriver\Exception\WebDriverException;
-use Facebook\WebDriver\Remote\DesiredCapabilities;
-use Facebook\WebDriver\Remote\RemoteWebDriver;
-use Facebook\WebDriver\WebDriverBy;
 
-class ProxyPHPWebDriver extends HttpPHPWebDriver implements IHttpClient
+
+/** HTTP client  for  Cloudflare protected sites */
+
+class ProxyPHPWebDriver extends HttpPHPWebDriver
 {
-
-    private function getStarted()
-    {
-        $browserType = Config::get('browserType');
-
-        if (Config::get('proxyOn') == 0) $proxy = '';
-        elseif (Config::get('proxyOn') == 1 && !empty(Config::get('workProxy'))) {
-            $proxy = join(Config::get('workProxy'));
-        } else Exit('WebDriver: proxy not found');
-
-        $host = 'http://localhost:4444/wd/hub';
-        $capabilities = DesiredCapabilities::$browserType();
-        $capabilities->setCapability('acceptSslCerts', false);
-
-        $this->driver = RemoteWebDriver::create($host, $capabilities);
-    }
-
+    /**
+     * @param string $page
+     * @param string $proxy
+     * @return string
+     */
     public function getPage($page, $proxy = '')
     {
-        $content = '';
+        $source = '';
         static $d = 0;
 
-        if(!$this->driver)$this->getStarted();
+        if (self::$goodWork == 0) $this->getStarted();
+        self::$goodWork++;
 
         try {
+
             if ($d < 3) {
                 $this->driver->get($page);
                 sleep(10);
@@ -45,16 +36,22 @@ class ProxyPHPWebDriver extends HttpPHPWebDriver implements IHttpClient
                 sleep(rand(3, 7));
             }
 
-            $element = $this->driver->findElement(WebDriverBy::tagName('*'));
-            $content = $element->getAttribute('outerHTML');
+            $source = $this->driver->getPageSource();
 
+            if (Config::get('proxyOn') == 1) {
+                $resp = $this->errorRespZero($source);
+                if ($resp) $this->errorResponse('0', $page);
+            }
 
         } catch (WebDriverException $e) {
+            self::$goodWork = 0;
+            CookingProxy::replace(Config::get('workProxy'));
+            $this->close();
+            echo '..............catch<br>';//!!!!!!!!!!!!!!!!!!!!!!!!!!!!
         }
+        $this->saveHTMLPage($source, $page);
 
-        $this->saveHTMLPage($content, $page);
-
-        return $content;
+        return $source;
     }
 
 }

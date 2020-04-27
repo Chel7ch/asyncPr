@@ -5,6 +5,8 @@ namespace Client;
 use Config\Config;
 use Exception;
 
+/** HTTP client */
+
 class HttpCurl implements IHttpClient
 {
     use LogErrorResponse, SaveHTMLPage;

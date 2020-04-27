@@ -11,6 +11,7 @@ class FileExecute
         file_exists(Config::get('logErrRespDir')) ?: mkdir(Config::get('logErrRespDir'));
 
         $nameFile = Config::get('logErrRespDir') . '/' . $fName . '.csv';
+
         $fd = fopen($nameFile, 'a');
         foreach ($data as $d) {
             $d = str_replace(array("\r", "\n",'\''), '', $d);
