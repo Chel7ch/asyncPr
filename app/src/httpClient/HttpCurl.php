@@ -4,11 +4,46 @@ namespace Client;
 
 use Config\Config;
 use Exception;
-use Proxy\CookingProxy;
 
 class HttpCurl implements IHttpClient
 {
     use LogErrorResponse, SaveHTMLPage;
+
+    /**
+     * @param string $page
+     * @return string
+     */
+    public function getPage($page)
+    {
+        $content = '';
+
+        if (Config::get('proxyOn') == 0) $proxy = '';
+        elseif (Config::get('proxyOn') == 1 && !empty(Config::get('workProxy')))
+            $proxy = join((array)Config::get('workProxy'));
+        else Exit('Curl: proxy not found');
+
+        $curl = $this->setoptCurl($page, $proxy);
+        try {
+            $content = curl_exec($curl);
+
+            $resp = curl_getinfo($curl);
+            $this->curlInfo($resp, $page, $curl);
+
+            $this->errorResponse($resp['http_code'], $page, $proxy);
+
+            if (!$curl) throw new Exception('Curl not found');
+
+        } catch (Exception $e) {
+            echo 'Curl: ' . $e->getMessage();
+        }
+
+        curl_close($curl);
+
+        $this->saveHTMLPage($content, $page);
+
+        return $content;
+
+    }
 
     /**
      * @param array $urls
@@ -56,6 +91,40 @@ class HttpCurl implements IHttpClient
 
     }
 
+    /**
+     * @param string $page
+     * @param string $postData
+     * @return bool|string
+     */
+    public function postPage($page, $postData)
+    {
+        $curl = $this->setoptCurl($page);
+        curl_setopt($curl, CURLOPT_POST, 1); // TRUE для HTTP POST
+        curl_setopt($curl, CURLOPT_POSTFIELDS, Config::get('postData')); // сами POST переменые
+        try {
+            $content = curl_exec($curl);
+
+            $resp = curl_getinfo($curl);
+            $this->curlInfo($resp, $page, $curl);
+
+            if (!Config::get('postData')) throw new Exception('POST data not found');
+
+        } catch (Exception $e) {
+            echo 'Curl: ' . $e->getMessage();
+        }
+
+        curl_close($curl);
+
+        $this->saveHTMLPage($content, $page);
+
+        return $content;
+    }
+
+    /**
+     * @param int $resp
+     * @param string $url
+     * @param descriptor $curl
+     */
     public function curlInfo($resp, $url, $curl)
     {
         if (Config::get('curlHTTPInfo') >= 1) {
@@ -112,67 +181,5 @@ class HttpCurl implements IHttpClient
         return $curl;
 
     }
-
-    /**
-     * @param string $page
-     * @param string $proxy
-     * @return bool|string
-     */
-    public function getPage($page)
-    {
-        $content = '';
-
-        if (Config::get('proxyOn') == 0) $proxy = '';
-        elseif (Config::get('proxyOn') == 1 && !empty(Config::get('workProxy')))
-            $proxy = join((array)Config::get('workProxy'));
-        else Exit('Curl: proxy not found');
-
-        $curl = $this->setoptCurl($page, $proxy);
-        try {
-            $content = curl_exec($curl);
-
-            $resp = curl_getinfo($curl);
-            $this->curlInfo($resp, $page, $curl);
-
-            $this->errorResponse($resp['http_code'], $page, $proxy);
-
-            if (!$curl) throw new Exception('Curl not found');
-
-        } catch (Exception $e) {
-            echo 'Curl: ' . $e->getMessage();
-        }
-
-        curl_close($curl);
-
-        $this->saveHTMLPage($content, $page);
-
-        return $content;
-
-    }
-
-    public function postPage($page, $postData)
-    {
-        $curl = $this->setoptCurl($page);
-        curl_setopt($curl, CURLOPT_POST, 1); // TRUE для HTTP POST
-        curl_setopt($curl, CURLOPT_POSTFIELDS, Config::get('postData')); // сами POST переменые
-        try {
-            $content = curl_exec($curl);
-
-            $resp = curl_getinfo($curl);
-            $this->curlInfo($resp, $page, $curl);
-
-            if (!Config::get('postData')) throw new Exception('POST data not found');
-
-        } catch (Exception $e) {
-            echo 'Curl: ' . $e->getMessage();
-        }
-
-        curl_close($curl);
-
-        $this->saveHTMLPage($content, $page);
-
-        return $content;
-    }
-
 
 }

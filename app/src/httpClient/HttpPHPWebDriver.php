@@ -22,6 +22,7 @@ class HttpPHPWebDriver implements IHttpClient
     public static $goodWork;
 
     /**
+     * Initiate the browser
      *  browser_type
      *  :firefox => firefox
      *  :chrome  => chrome
@@ -56,6 +57,11 @@ class HttpPHPWebDriver implements IHttpClient
         $this->driver = RemoteWebDriver::create($host, $capabilities);
     }
 
+    /**
+     * @param string $page
+     * @param string $proxy
+     * @return string
+     */
     public function getPage($page, $proxy = '')
     {
         $source = '';
@@ -83,12 +89,18 @@ class HttpPHPWebDriver implements IHttpClient
         return $source;
     }
 
+    /**
+     * changing the proxy
+     * @param string $content
+     * @return string
+     */
     public function errorRespZero($content)
     {
         $response = '';
-        if (strpos($content, 'ERR_PROXY_CONNECTION_FAILED') or
+        if (!$content or strpos($content, 'ERR_PROXY_CONNECTION_FAILED') or
             strpos($content, 'ERR_PROXY_CONNECTION_FAILED') or
             strpos($content, 'ERR_TIMED_OUT') or
+            strpos($content, 'ERR_CONNECTION_TIMED_OUT') or
             strpos($content, 'ERR_CONNECTION_CLOSED') or
             strpos($content, 'ERR_EMPTY_RESPONSE')) {
 
@@ -96,11 +108,16 @@ class HttpPHPWebDriver implements IHttpClient
             self::$goodWork = 0;
             $this->close();
             echo '..............errorRespZero<br>';//!!!!!!!!!!!!
+            print_r(Config::get('workProxy')) ;echo '         __________workProxy';
             $response = 0;
         }
         return $response;
     }
 
+    /**
+     * @param array $urls
+     * @return array
+     */
     public function getGroupPages($urls)
     {
         $content = array();
@@ -112,6 +129,11 @@ class HttpPHPWebDriver implements IHttpClient
         return $content;
     }
 
+    /**
+     * @param string $page
+     * @param array $postData
+     * @return string
+     */
     public function postPage($page, $postData)
     {
         $this->driver->get($page);
@@ -129,6 +151,7 @@ class HttpPHPWebDriver implements IHttpClient
 
     }
 
+    /** close browser */
     public function close()
     {
         $this->driver->close();

@@ -49,6 +49,7 @@ class Spider extends ParserPage
         while (empty($links)) {
             $this->replaceProxy(join(Config::get('workProxy')));
             $links = $this->getLinks($url, $scratches);
+            usleep(Config::get('usleep'));
         }
 
         return $links;

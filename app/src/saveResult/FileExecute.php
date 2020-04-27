@@ -13,7 +13,8 @@ class FileExecute
         $nameFile = Config::get('logErrRespDir') . '/' . $fName . '.csv';
         $fd = fopen($nameFile, 'a');
         foreach ($data as $d) {
-            $d = str_replace('\'', '', $d);
+            $d = str_replace(array("\r", "\n",'\''), '', $d);
+
             fputs($fd, $d . PHP_EOL);
         }
         fclose($fd);

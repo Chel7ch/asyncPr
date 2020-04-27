@@ -50,12 +50,12 @@ class ReadSavedFiles extends ParserRoutine
     {
         $data[] = $url;
         foreach ($scratches as $scratch) {
-            (Config::get('usingXPATH') == 1) ? $dt = $page->find($scratch, Query::TYPE_XPATH) : $dt = $page->find($scratch);
-            $data[] = $this->filter->cleanLinks($dt);
+            (Config::get('usingXPATH') == 1)
+                ? $dt = $page->find($scratch, Query::TYPE_XPATH) : $dt = $page->find($scratch);
+            $data[] = $dt;
         }
 
         $this->data = $this->output->prepOutput($data);
-
         if (empty($this->data)) return;
 
         $this->query = $this->output->prepInsert($this->data);
@@ -67,9 +67,8 @@ class ReadSavedFiles extends ParserRoutine
     public function getLinks($patern = '\w+')
     {
         $match = array();
-        $dir = Config::get('saveHTMLDir');
 
-        if (file_exists($dir)) $files = scandir($dir);
+        if (file_exists(Config::get('saveHTMLDir'))) $files = scandir(Config::get('saveHTMLDir'));
 
         foreach ($files as $file) {
             if (preg_match("#$patern#", $file) and strpos($file, '.html', -5)) {

@@ -7,7 +7,7 @@ use Config\IoC;
 
 
 Config::set('connectDB', 0); // 1 - turn on writing in DB
-Config::set('outputWithUrl',1); // 1 - turn on add a column with url to output
+Config::set('outputWithUrl',0); // 1 - turn on add a column with url to output
 
 
 //$filterLinks = Ioc::resolve('filterlinks', 'empty');
