@@ -61,9 +61,5 @@ return [
     'referer' => 'http://diesel.elcat.kg/',
     'header' => $header,
     'postData' => null,
-//    'browserType' => 'firefox', //type browser for webDriver
     'browserType' => 'chrome', //type browser for webDriver
-//    'browserType' => 'microsoftEdge', //type browser for webDriver
-    /** own service */
-    'nextStep' => 0, //0 - default
 ];
