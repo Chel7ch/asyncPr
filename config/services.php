@@ -6,6 +6,7 @@ return array(
             'guzzle' => 'Client\HttpGuzzle',
             'webDriver' => 'Client\HttpPHPWebDriver',
             'proxyWebDriver' => 'Client\ProxyPHPWebDriver',
+            'olxUa' => 'Client\OlxPHPWebDriver',
         ),
     'filterlinks' =>
         array(

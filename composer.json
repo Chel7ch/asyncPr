@@ -4,7 +4,9 @@
     "imangazaliev/didom": "^1.14",
     "ext-pdo": "*",
     "ext-curl": "*",
-    "php-webdriver/webdriver": "^1.7"
+    "php-webdriver/webdriver": "^1.7",
+    "ext-gd": "*",
+    "thiagoalessio/tesseract_ocr": "^2.9"
   },
   "autoload": {
     "psr-4": {

@@ -40,6 +40,7 @@ class CookingProxy
      */
     public static function replace($badProxy)
     {
+        if (Config::get('proxyOn') == 0) return;
         if (empty($badProxy)) exit('CookingProxy: incoming data is invalid');
 
         self::$badProxy[] = $badProxy;

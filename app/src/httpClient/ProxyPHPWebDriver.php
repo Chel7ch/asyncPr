@@ -9,7 +9,7 @@ use Facebook\WebDriver\Exception\WebDriverException;
 
 /** HTTP client  for  Cloudflare protected sites */
 
-class ProxyPHPWebDriver extends HttpPHPWebDriver
+class ProxyPHPWebDriver extends HttpPHPWebDriver implements IHttpClient
 {
     /**
      * @param string $page

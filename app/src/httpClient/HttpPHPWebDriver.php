@@ -11,8 +11,7 @@ use Facebook\WebDriver\Remote\RemoteWebDriver;
 use Facebook\WebDriver\WebDriverBy;
 
 /** HTTP client */
-
-class HttpPHPWebDriver
+class HttpPHPWebDriver implements IHttpClient
 {
     use LogErrorResponse, SaveHTMLPage;
 
@@ -28,7 +27,7 @@ class HttpPHPWebDriver
      *  :chrome  => chrome
      *  :ie      => microsoftEdge     *
      */
-    protected function getStarted()
+    public function getStarted()
     {
         $browserType = Config::get('browserType');
 
@@ -52,7 +51,7 @@ class HttpPHPWebDriver
             $capabilities->setCapability(ChromeOptions::CAPABILITY, $options);
 
         } elseif ($browserType == 'firefox') {
-            $capabilities->setCapability('moz:firefoxOptions', ['args' => ['-headless']]);
+//            $capabilities->setCapability('moz:firefoxOptions', ['args' => ['-headless']]);
         }
         $this->driver = RemoteWebDriver::create($host, $capabilities);
     }
